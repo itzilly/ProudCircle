@@ -59,14 +59,13 @@ async def main():
 
     # Generate, load, and check the config file
     # Note: Will NOT override existing config
-    config_generator = fs.generate_config()
-    fs.Settings.load()
-    config = fs.Settings.config
-    if fs.Settings.check_token() is False:
+    registers.Settings.load()
+    config = registers.Settings.config
+    if registers.Settings.check_token() is False:
         exit(2)
 
-    # Check all extra files such as database files
-    register = registers.load_all()
+    # Loads all registries
+    registers.load_all()
 
     # Bot Meta-data Setup
     bot_intents = discord.Intents.default()
