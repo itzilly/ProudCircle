@@ -29,7 +29,7 @@ def get_guild_registry_build():
             'ranks': []
         }
     }
-    
+
 
 class UuidRegistry:
     data = None
@@ -144,7 +144,7 @@ def load_all():
 
 class Settings:
     config = None
-    _config_file_path = './bin/config.yaml'
+    _config_file_path = './data/config.yaml'
 
     @classmethod
     def _get_config_build(cls):
@@ -226,5 +226,6 @@ class Settings:
                 indent=2    
             )
         logging.info("Generated main configuration file")
+        Settings.load()
         return False
         

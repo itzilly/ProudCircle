@@ -59,7 +59,7 @@ async def main():
 
     # Generate, load, and check the config file
     # Note: Will NOT override existing config
-    registers.Settings.load()
+    registers.Settings.generate()
     config = registers.Settings.config
     if registers.Settings.check_token() is False:
         exit(2)
