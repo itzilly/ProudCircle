@@ -51,8 +51,8 @@ async def main():
         datefmt=datetime_format,
         format=formatter,
         handlers=[
-            logging.FileHandler("./bin/logs/discord.log"),
-            logging.FileHandler("./bin/logs/" + str(datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) + ".log"),
+            logging.FileHandler("./data/logs/discord.log"),
+            logging.FileHandler("./data/logs/" + str(datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) + ".log"),
             logging.StreamHandler(sys.stdout)
         ]
     )
