@@ -1,4 +1,5 @@
 import os
+import logging
 
 def get_all_extensions():
 	ext = []
