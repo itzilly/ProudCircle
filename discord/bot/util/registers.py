@@ -215,6 +215,7 @@ class Settings:
     @staticmethod
     def generate():
         if os.path.exists(Settings._config_file_path):
+            Settings.load()
             return True
         logging.warning("No main config file detected")
         logging.debug("Generating main configuration file...")
