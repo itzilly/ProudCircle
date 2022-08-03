@@ -31,8 +31,8 @@ class SetupCommands(commands.GroupCog, name="setup"):
 
     @app_commands.command(name="roles", description="Create all roles for the discord bot")
     async def create_all_roles(self, interaction: discord.Interaction) -> None:
-    	subcommand_name = "/setup roles"
-    	logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
+        subcommand_name = "/setup roles"
+        logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
 
         # Permissions Check
         if not interaction.user.resolved_permissions.administrator:
@@ -220,8 +220,8 @@ class SetupCommands(commands.GroupCog, name="setup"):
 
     @app_commands.command(name="rules", description="Select channel for rules")
     async def setup_rules(self, interaction: discord.Interaction) -> None:
-    	subcommand_name = "/setup rules"
-    	logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
+        subcommand_name = "/setup rules"
+        logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
 
         # Permissions Check
         if not interaction.user.get_role(registers.Settings.config['discord']['role_ids']['bot_admin']):
@@ -253,8 +253,8 @@ class SetupCommands(commands.GroupCog, name="setup"):
 
     @app_commands.command(name="verification", description="Select channel for verification")
     async def setup_verification(self, interaction: discord.Interaction) -> None:
-    	subcommand_name = "/setup verification"
-    	logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
+        subcommand_name = "/setup verification"
+        logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
 
         # Permissions Check
         if not interaction.user.get_role(registers.Settings.config['discord']['role_ids']['bot_admin']):
@@ -283,8 +283,8 @@ class SetupCommands(commands.GroupCog, name="setup"):
 
     @app_commands.command(name="linking", description="Setup linking discord account with hypixel account")
     async def setup_linking(self, interaction: discord.Interaction) -> None:
-    	subcommand_name = "/setup linking"
-    	logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
+        subcommand_name = "/setup linking"
+        logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
 
         # Permissions Check
         if not interaction.user.get_role(registers.Settings.config['discord']['role_ids']['bot_admin']):
@@ -295,9 +295,6 @@ class SetupCommands(commands.GroupCog, name="setup"):
             return await interaction.response.send_message(embed=embed)
 
         await interaction.response.send_message("This feature is not yet avalible!")
-
-
-
 
 
 async def setup(bot: commands.Bot):
