@@ -186,7 +186,7 @@ class SetupCommands(commands.GroupCog, name="setup"):
         )
 
         # Update configuration file with all role id's
-        config = .Settings.config
+        config = registers.Settings.config
         role_ids = config['discord']['role_ids']
         role_ids['bot_admin'] = bot_admin_role.id
         role_ids['discord_staff'] = discord_staff_role.id
