@@ -31,11 +31,6 @@ class ProudCircleDiscordBot(commands.Bot):
         await self.tree.sync()
 
 
-# Checkers for db and yaml files:
-def check_files():
-    pass
-
-
 # Startup discord bot
 async def main():
     # Setup logger
@@ -59,10 +54,8 @@ async def main():
 
     # Generate, load, and check the config file
     # Note: Will NOT override existing config
-    registers.Settings.generate()
+    registers.Settings.check_config()
     config = registers.Settings.config
-    if registers.Settings.check_token() is False:
-        exit(2)
 
     # Loads all registries
     registers.load_all()
