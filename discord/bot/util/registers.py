@@ -83,7 +83,6 @@ class UuidRegistry:
         UuidRegistry.reload()
 
 
-
 class GuildRegistry:
     raw_data = None
     data = None
@@ -198,13 +197,17 @@ class Settings:
         logging.debug("Reloading main configuration file")
         with open(Settings._config_file_path) as file:
             _settings = yaml.load(file, Loader=yaml.SafeLoader)
+            print(_settings)
         Settings.config = _settings
 
     @staticmethod
     def update(new_yaml_data):
         logging.debug("Updating main configuration file")
+        print(new_yaml_data)
         with open(Settings._config_file_path, 'w') as file:
             new_data = yaml.dump(new_yaml_data, file, sort_keys=False, default_flow_style=False)
+            print("has updated")
+        Settings.config = new_data
         Settings.reload()
 
     @staticmethod
@@ -224,9 +227,22 @@ class Settings:
                 Settings._get_config_build(),
                 config_file,
                 sort_keys=False,
-                indent=2    
+                indent=2
             )
         logging.info("Generated main configuration file")
         Settings.load()
         return False
-        
+
+    @staticmethod
+    def check_config():
+        with open(Settings._config_file_path) as testfile:
+            yaml_data = yaml.load(testfile, Loader=yaml.SafeLoader)
+        try:
+            if isinstance(str, yaml_data['bot']['token']):
+                return True
+            else:
+                logging.critical("No bot token detected! Please edit 'bin/data/config.yml' INFO->BOT->TOKEN")
+        except AttributeError:
+            logging.critical("No bot token detected! Please edit 'bin/data/config.yml' INFO->BOT->TOKEN")
+
+        exit(2)
