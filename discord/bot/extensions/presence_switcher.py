@@ -1,7 +1,9 @@
 import logging
+
 from discord import Activity
-from discord.ext import tasks, commands
 from discord.enums import ActivityType
+from discord.ext import tasks, commands
+from util.config_handler import Settings
 
 
 class PresenceSwitcher(commands.Cog):
@@ -15,10 +17,19 @@ class PresenceSwitcher(commands.Cog):
     async def presence_switcher(self):
         online_discord_members = 0
         total_discord_members = 0
+
+        guild = self.bot.get_guild(Settings.config['discord']['server_id'])
+
         if self.show_discord_members:
-            presence = Activity(name=f"{total_discord_members} total discord members", type=ActivityType.playing)
+            presence = Activity(name=f"{guild.member_count} total discord members", type=ActivityType.playing)
+            self.show_discord_members = True
         else:
-            presence = Activity(name=f"{online_discord_members} online discord members", type=ActivityType.watching)
+            online = 0
+            for member in guild.members:
+                if member.is_on_mobile() or member.status.online or member.status.idle or member.status.do_not_disturb:
+                    online += 1
+            presence = Activity(name=f"{online} online discord members", type=ActivityType.watching)
+            self.show_discord_members = False
 
         await self.bot.change_presence(activity=presence)
 
