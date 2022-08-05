@@ -79,12 +79,16 @@ class Settings:
             Settings._generate_file()
 
         settings = Settings._load_file()
-        test = settings['bot']['token']
+        try:
+            test = settings['bot']['token']
 
-        if test is None:
-            logging.critical("No bot token detected! Please enter your bot token in '/data/config.yaml' | bot -> token")
-            exit(2)
-        if len(test) > 10:
+            if test is None:
+                logging.critical("No bot token detected! Please enter your bot token in '/data/config.yaml' | bot -> token")
+                exit(2)
+            if len(test) > 10:
+                logging.critical("No bot token detected! Please enter your bot token in '/data/config.yaml' | bot -> token")
+                exit(2)
+        except AttributeError:
             logging.critical("No bot token detected! Please enter your bot token in '/data/config.yaml' | bot -> token")
             exit(2)
 
