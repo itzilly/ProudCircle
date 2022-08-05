@@ -3,8 +3,7 @@ import logging
 from discord import app_commands
 from discord.ext import commands
 
-from util import fs
-from util import registers
+from util.config_handler import Settings
 from util.embed_builder import EmbedBuilder
 
 
@@ -21,7 +20,6 @@ discord_rules = """
 [ :x: ]  Do not debate/talk back to/try to reason/argue with staff.
 [ :x: ]  Don't be a dick, it's that simple!
 """
-
 
 
 class SetupCommands(commands.GroupCog, name="setup"):
@@ -42,10 +40,10 @@ class SetupCommands(commands.GroupCog, name="setup"):
             )
             return await interaction.response.send_message(embed=embed)
 
-        await interaction.response.send_message("Please wait while I create all roles...")
+        await interaction.channel.send("Please wait while I create all roles...")
 
         # Check if the roles have already been created
-        if registers.Settings.config['discord']['roles_have_been_created']:
+        if Settings.config['discord']['roles_have_been_created']:
             embed = discord.Embed(
                 description="You cannot use this command more than once! The discord roles have already been created.",
                 colour=discord.Colour(0xfa1195)
@@ -186,7 +184,7 @@ class SetupCommands(commands.GroupCog, name="setup"):
         )
 
         # Update configuration file with all role id's
-        config = registers.Settings.config
+        config = Settings.config
         role_ids = config['discord']['role_ids']
         role_ids['bot_admin'] = bot_admin_role.id
         role_ids['discord_staff'] = discord_staff_role.id
@@ -199,7 +197,7 @@ class SetupCommands(commands.GroupCog, name="setup"):
         role_ids['verified'] = verified_role.id
         role_ids['everyone'] = interaction.user.roles[0]
         config['discord']['roles_have_been_created'] = True
-        registers.Settings.update(config)
+        Settings.update_config(config)
 
         # Inform user about the updates
         embed = discord.Embed(description="Created all roles!",
@@ -216,7 +214,6 @@ class SetupCommands(commands.GroupCog, name="setup"):
                                              f"{discord_guest_role.mention} \n"
                                              f"{verified_role.mention}")
         await interaction.response.send_message(embed=embed)
-        # TODO: Fix Champion Role Color
 
     @app_commands.command(name="rules", description="Select channel for rules")
     async def setup_rules(self, interaction: discord.Interaction) -> None:
@@ -224,7 +221,7 @@ class SetupCommands(commands.GroupCog, name="setup"):
         logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
 
         # Permissions Check
-        if not interaction.user.get_role(registers.Settings.config['discord']['role_ids']['bot_admin']):
+        if not interaction.user.get_role(Settings.config['discord']['role_ids']['bot_admin']):
             embed = discord.Embed(
                 description=":x:  You do not have permission to use this command!  :x:",
                 colour=discord.Colour(0xfa1195)
@@ -232,10 +229,10 @@ class SetupCommands(commands.GroupCog, name="setup"):
             return await interaction.response.send_message(embed=embed)
 
         # Update Config with rules channel ID
-        config = registers.Settings.config
+        config = Settings.config
         channel_ids = config['discord']['channel_ids']
         channel_ids['rules'] = interaction.channel_id
-        registers.Settings.update(config)
+        Settings.update_config(config)
 
         # Response Embed
         embed = EmbedBuilder()
@@ -244,7 +241,7 @@ class SetupCommands(commands.GroupCog, name="setup"):
         embed.add_field(
             title="**Discord Rules**\n"
                   "Please read the rules before continuing\n"
-                  "*Please note our guild is a serious place and unallowed behavior WILL be punished!*",
+                  "*Please note our guild is a serious place and disallowed behavior WILL be punished!*",
             field_data=discord_rules
         )
         embed.remove_author()
@@ -257,7 +254,7 @@ class SetupCommands(commands.GroupCog, name="setup"):
         logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
 
         # Permissions Check
-        if not interaction.user.get_role(registers.Settings.config['discord']['role_ids']['bot_admin']):
+        if not interaction.user.get_role(Settings.config['discord']['role_ids']['bot_admin']):
             embed = discord.Embed(
                 description=":x:  You do not have permission to use this command!  :x:",
                 colour=discord.Colour(0xfa1195)
@@ -267,9 +264,9 @@ class SetupCommands(commands.GroupCog, name="setup"):
         await interaction.response.send_message("Please wait while I setup verification...")
 
         # Make all channels invisible unless member is verified
-        config = registers.Settings.config
+        config = Settings.config
         verified_role_id = config['discord']['role_ids']['verified']
-        guild_member_role_id = config['discord']['role_ids']['guild_member']
+        # guild_member_role_id = config['discord']['role_ids']['guild_member']
         for channel in interaction.guild.channels:
             await channel.set_permissions(interaction.guild.default_role, view_channel=False)  # @everyone can't see
             await channel.set_permissions(interaction.guild.get_role(verified_role_id), view_channel=True)  # @verified can see
@@ -287,14 +284,14 @@ class SetupCommands(commands.GroupCog, name="setup"):
         logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
 
         # Permissions Check
-        if not interaction.user.get_role(registers.Settings.config['discord']['role_ids']['bot_admin']):
+        if not interaction.user.get_role(Settings.config['discord']['role_ids']['bot_admin']):
             embed = discord.Embed(
                 description=":x:  You do not have permission to use this command!  :x:",
                 colour=discord.Colour(0xfa1195)
             )
             return await interaction.response.send_message(embed=embed)
 
-        await interaction.response.send_message("This feature is not yet avalible!")
+        await interaction.response.send_message("This feature is not yet available!")
 
 
 async def setup(bot: commands.Bot):

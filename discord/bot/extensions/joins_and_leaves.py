@@ -3,8 +3,9 @@ import discord
 
 from discord.ext import commands
 
-from util.registers import Settings
+from util.config_handler import Settings
 from util.embed_builder import EmbedBuilder
+
 
 class DiscordListener(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -14,9 +15,9 @@ class DiscordListener(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         logging.debug(f"| MEMBER JOIN EVENT | {member.name}#{member.discriminator} joined (id: {member.id})")
-        welcome_channel = self.bot.get_channel(settings.config['discord']['channel_ids']['welcome'])
-        rules_channel = self.bot.get_channel(settings.config['discord']['channel_ids']['rules'])
-        verification_channel = self.bot.get_channel(settings.config['discord']['channel_ids']['verification'])
+        welcome_channel = self.bot.get_channel(Settings.config['discord']['channel_ids']['welcome'])
+        rules_channel = self.bot.get_channel(Settings.config['discord']['channel_ids']['rules'])
+        verification_channel = self.bot.get_channel(Settings.config['discord']['channel_ids']['verification'])
         join_embed = EmbedBuilder()
         join_embed.set_title("A Wild Member has joined!")
         join_embed.use_default_thumbnail()
@@ -30,7 +31,7 @@ class DiscordListener(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         logging.debug(f"| MEMBER LEAVE EVENT | {member.name}#{member.discriminator} joined (id: {member.id})")
-        channel = self.bot.get_channel(settings.config['discord']['channel_ids']['rules'])
+        channel = self.bot.get_channel(Settings.config['discord']['channel_ids']['rules'])
         leave_embed = discord.Embed(
             description=f"Sorry to see you go {member.mention} :wave:",
             colour=discord.Colour(0xfa1195)

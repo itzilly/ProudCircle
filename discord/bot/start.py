@@ -7,6 +7,7 @@ from util import fs
 from util import registers
 from datetime import datetime
 from discord.ext import commands
+from util.config_handler import Settings
 
 
 # The Proud Circle Discord Bot
@@ -54,8 +55,8 @@ async def main():
 
     # Generate, load, and check the config file
     # Note: Will NOT override existing config
-    registers.Settings.check_config()
-    config = registers.Settings.config
+    Settings.first_load()
+    config = Settings.config
 
     # Loads all registries
     registers.load_all()
