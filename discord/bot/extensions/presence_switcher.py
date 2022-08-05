@@ -15,9 +15,6 @@ class PresenceSwitcher(commands.Cog):
 
     @tasks.loop(seconds=10)
     async def presence_switcher(self):
-        online_discord_members = 0
-        total_discord_members = 0
-
         guild = self.bot.get_guild(Settings.config['discord']['server_id'])
 
         if self.show_discord_members:
