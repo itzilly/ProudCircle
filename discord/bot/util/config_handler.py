@@ -12,7 +12,7 @@ class Settings:
     def get_settings_build():
         return {
                 'info': {
-                    'config_version': '1.0.0',
+                    'config_version': '1.0.1',
                     'bot_version': 'Pre-v1.0.0'
                 },
                 'bot': {
@@ -39,6 +39,9 @@ class Settings:
                         'welcome': 0,
                         'leave': 0,
                         'rules': 0
+                    },
+                    'message_ids': {
+                        'verification_id': None
                     }
                 },
                 'hypixel': {
