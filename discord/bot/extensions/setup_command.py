@@ -3,6 +3,7 @@ import logging
 from discord import app_commands
 from discord.ext import commands
 
+import util.embed_builder
 from util.config_handler import Settings
 from util.embed_builder import EmbedBuilder
 
@@ -268,9 +269,10 @@ class SetupCommands(commands.GroupCog, name="setup"):
         config = Settings.config
         verified_role_id = config['discord']['role_ids']['verified']
         # guild_member_role_id = config['discord']['role_ids']['guild_member']
-        for channel in interaction.guild.channels:
-            await channel.set_permissions(interaction.guild.default_role, view_channel=False)  # @everyone can't see
-            await channel.set_permissions(interaction.guild.get_role(verified_role_id), view_channel=True)  # @verified can see
+        # for channel in interaction.guild.channels:
+            # if channel.id is not Settings.config['discord']['channel_ids']['rules']:
+                # await channel.set_permissions(interaction.guild.default_role, view_channel=False)  # @everyone can't see
+                # await channel.set_permissions(interaction.guild.get_role(verified_role_id), view_channel=True)  # @verified can see
         verified_channel = await interaction.guild.create_text_channel(
             name="verification",
             reason="Create verified channel"
@@ -278,6 +280,16 @@ class SetupCommands(commands.GroupCog, name="setup"):
         config['discord']['channel_ids']['verification'] = verified_channel.id
         await verified_channel.set_permissions(interaction.guild.default_role, view_channel=True)
         await verified_channel.set_permissions(interaction.guild.get_role(verified_role_id), view_channel=False)
+
+        verification_message_embed = util.embed_builder.EmbedBuilder()
+        verification_message_embed.add_field("How do I get verified?",
+             "Please react with the checkmark emoji :ballot_box_with_check: in order to get verified!")
+        get_verified_embed = verification_message_embed.build()
+
+        get_verified_message = await verified_channel.send(embed=get_verified_embed)
+        verified_message_id = get_verified_message.id
+        config['discord']['message_ids']['verification_id'] = verified_message_id
+        Settings.update_config(config)
 
     @app_commands.command(name="linking", description="Setup linking discord account with hypixel account")
     async def setup_linking(self, interaction: discord.Interaction) -> None:
