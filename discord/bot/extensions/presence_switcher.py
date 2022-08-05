@@ -10,6 +10,7 @@ class PresenceSwitcher(commands.Cog):
     def __init__(self, bot: commands.Bot, *args, **kwargs):
         self.bot = bot
         self.show_discord_members = True
+        self.presence_switcher.start()
         super().__init__(*args, **kwargs)
 
     @tasks.loop(seconds=10)
@@ -35,8 +36,7 @@ class PresenceSwitcher(commands.Cog):
     @presence_switcher.before_loop
     async def before_switching_presence(self):
         await self.bot.wait_until_ready()
-        self.presence_switcher.start()
-
+        
 
 async def setup(bot: commands.Bot):
     logging.debug("Adding cog: PresenceSwitcher")
