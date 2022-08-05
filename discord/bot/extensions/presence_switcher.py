@@ -1,10 +1,7 @@
-import asyncio
-import discord
 import logging
 from discord import Activity
 from discord.ext import tasks, commands
 from discord.enums import ActivityType
-from datetime import datetime, timedelta
 
 
 class PresenceSwitcher(commands.Cog):
@@ -22,6 +19,7 @@ class PresenceSwitcher(commands.Cog):
         else:
             presence = Activity(name=f"{online_discord_members} online discord members", type=ActivityType.watching)
 
+        print("Switching presence")
         await self.bot.change_presence(activity=presence)
 
     @presence_switcher.before_loop
@@ -30,5 +28,5 @@ class PresenceSwitcher(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    logging.debug("Adding cog: SetupCommands")
+    logging.debug("Adding cog: PresenceSwitcher")
     await bot.add_cog(PresenceSwitcher(bot))
