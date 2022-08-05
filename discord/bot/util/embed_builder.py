@@ -26,7 +26,7 @@ class EmbedBuilder:
 
     @DeprecationWarning
     def use_default_thumbnail(self):
-        self.files.append(discord.File("./bin/images/icon.png", filename="icon.png"))
+        self.files.append(discord.File("./data/images/icon.png", filename="icon.png"))
         self.embed.set_thumbnail(url="attachment://icon.png")
 
     def remove_author(self):
@@ -37,10 +37,10 @@ class EmbedBuilder:
             timezone = pytz.timezone('EST')
             self.embed.timestamp = datetime.now(tz=timezone)
         if self.use_default_footer:
-            self.files.append(discord.File("./bin/images/itzilly-icon.png", filename="itzilly-icon.png"))
+            self.files.append(discord.File("./data/images/itzilly-icon.png", filename="itzilly-icon.png"))
             self.embed.set_footer(text="Made by illyum", icon_url="attachment://itzilly-icon.png")
         if self.use_default_thumbnail:
-            self.files.append(discord.File("./bin/images/icon.png", filename="icon.png"))
+            self.files.append(discord.File("./data/images/icon.png", filename="icon.png"))
             self.embed.set_thumbnail(url="attachment://icon.png")
         return self.embed
 
