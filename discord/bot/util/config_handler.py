@@ -107,3 +107,12 @@ class Settings:
             yaml.dump(new_config_data, file)
         logging.debug("Configuration file updated")
         Settings.config = Settings._load_file()
+
+    @staticmethod
+    @DeprecationWarning
+    def update(new_config_data):
+        """
+        Wrapper for update_config for backwards compatibility
+        """
+        logging.warning("Using deprecated method 'update' please use 'update_config'")
+        Settings.update_config(new_config_data)
