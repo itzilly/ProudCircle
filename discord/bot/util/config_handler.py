@@ -89,6 +89,8 @@ class Settings:
             logging.critical("No bot token detected! Please enter your bot token in '/data/config.yaml' | bot -> token")
             exit(2)
 
+        Settings.config = Settings._load_file()
+
     @staticmethod
     def load():
         """
