@@ -8,6 +8,7 @@ class PresenceSwitcher(commands.Cog):
     def __init__(self, bot: commands.Bot, *args, **kwargs):
         self.bot = bot
         self.show_discord_members = True
+        self.presence_switcher.start()
         super().__init__(*args, **kwargs)
 
     @tasks.loop(seconds=10)
@@ -19,7 +20,6 @@ class PresenceSwitcher(commands.Cog):
         else:
             presence = Activity(name=f"{online_discord_members} online discord members", type=ActivityType.watching)
 
-        print("Switching presence")
         await self.bot.change_presence(activity=presence)
 
     @presence_switcher.before_loop
