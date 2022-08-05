@@ -1,3 +1,5 @@
+import logging
+
 import discord
 
 from discord.ext import commands
@@ -25,3 +27,8 @@ class VerificationListener(commands.Cog):
 
         verified_role = self.bot.get_guild(payload.guild_id).get_role(verified_role_id)
         await payload.member.add_roles(verified_role)
+
+
+async def setup(bot):
+    logging.debug("Setting up VerificationListener")
+    await bot.add_cog(VerificationListener(bot))
