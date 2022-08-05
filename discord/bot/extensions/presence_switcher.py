@@ -10,15 +10,17 @@ class PresenceSwitcher(commands.Cog):
     def __init__(self, bot: commands.Bot, *args, **kwargs):
         self.bot = bot
         self.show_discord_members = True
-        self.presence_switcher.start()
         super().__init__(*args, **kwargs)
 
     @tasks.loop(seconds=10)
     async def presence_switcher(self):
         guild = self.bot.get_guild(Settings.config['discord']['server_id'])
+        total_members = 0
+        for member in guild.members:
+            total_members += 1
 
         if self.show_discord_members:
-            presence = Activity(name=f"{guild.member_count} total discord members", type=ActivityType.playing)
+            presence = Activity(name=f"{total_members} total discord members", type=ActivityType.playing)
             self.show_discord_members = True
         else:
             online = 0
@@ -33,6 +35,7 @@ class PresenceSwitcher(commands.Cog):
     @presence_switcher.before_loop
     async def before_switching_presence(self):
         await self.bot.wait_until_ready()
+        self.presence_switcher.start()
 
 
 async def setup(bot: commands.Bot):
