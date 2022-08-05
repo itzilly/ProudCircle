@@ -195,7 +195,7 @@ class SetupCommands(commands.GroupCog, name="setup"):
         role_ids['guild_member'] = guild_member_role.id
         role_ids['discord_guest'] = discord_guest_role.id
         role_ids['verified'] = verified_role.id
-        role_ids['everyone'] = interaction.user.roles[0]
+        role_ids['everyone'] = interaction.user.roles[0].id
         config['discord']['roles_have_been_created'] = True
         Settings.update_config(config)
 
@@ -232,6 +232,7 @@ class SetupCommands(commands.GroupCog, name="setup"):
         config = Settings.config
         channel_ids = config['discord']['channel_ids']
         channel_ids['rules'] = interaction.channel_id
+        print(config)
         Settings.update_config(config)
 
         # Response Embed
