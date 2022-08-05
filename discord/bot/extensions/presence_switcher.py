@@ -25,8 +25,11 @@ class PresenceSwitcher(commands.Cog):
         else:
             online = 0
             for member in guild.members:
-                if member.is_on_mobile() or member.status.online or member.status.idle or member.status.do_not_disturb:
-                    online += 1
+                try:
+                    if member.status.online or member.status.idle or member.status.do_not_disturb:
+                        online += 1
+                except Exception:
+                    online = online
 
             presence = Activity(name=f"{online} online discord members", type=ActivityType.watching)
             self.show_discord_members = True
