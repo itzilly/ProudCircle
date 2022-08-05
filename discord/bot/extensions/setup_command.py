@@ -232,7 +232,7 @@ class SetupCommands(commands.GroupCog, name="setup"):
         config = Settings.config
         channel_ids = config['discord']['channel_ids']
         channel_ids['rules'] = interaction.channel_id
-        print(config)
+        config['discord']['server_id'] = interaction.guild.id
         Settings.update_config(config)
 
         # Response Embed
