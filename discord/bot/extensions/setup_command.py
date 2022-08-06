@@ -283,10 +283,14 @@ class SetupCommands(commands.GroupCog, name="setup"):
 
         verification_message_embed = util.embed_builder.EmbedBuilder()
         verification_message_embed.add_field("How do I get verified?",
-             "Please react with the checkmark emoji :ballot_box_with_check: in order to get verified!")
+             f"Make sure you read {interaction.guild.get_channel(Settings.config['discord']['role_ids']['rules']).mention}"
+             f"Please react with the checkmark emoji :ballot_box_with_check: in order to get verified!")
         get_verified_embed = verification_message_embed.build()
 
         get_verified_message = await verified_channel.send(embed=get_verified_embed)
+        await get_verified_message.add_reaction('❤️')
+        await get_verified_message.add_reaction('☑️')
+        await get_verified_message.add_reaction('✅')
         verified_message_id = get_verified_message.id
         config['discord']['message_ids']['verification_id'] = verified_message_id
         Settings.update_config(config)
