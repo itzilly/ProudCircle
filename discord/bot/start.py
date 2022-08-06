@@ -65,6 +65,8 @@ async def main():
     bot_intents = discord.Intents.default()
     bot_intents.message_content = True
     bot_intents.members = True
+    bot_intents.guilds = True
+    bot_intents.reactions = True
     bot_pfx = commands.when_mentioned
     bot_description = "A Discord Bot for the Proud Circle Guild!"
 
