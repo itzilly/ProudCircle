@@ -5,18 +5,8 @@ import yaml
 import time
 import logging
 
+import util.uuid_database
 
-def get_uuid_registry_build():
-    # The default, empty build of the
-    # uuids registry dictionary
-    uuid_registry_build = {
-        'info': {
-        'time_generated': time.time(),
-        'last_updated': None
-        },
-        'uuids': []
-    }
-    return uuid_registry_build
 
 def get_guild_registry_build():
     guild_registry_build = {
@@ -29,58 +19,6 @@ def get_guild_registry_build():
             'ranks': []
         }
     }
-
-
-class UuidRegistry:
-    data = None
-    _uuid_registry_path = "./data/registers/uuids.registry"
-
-    @classmethod
-    def _load(cls):
-        with open(UuidRegistry._uuid_registry_path, 'r') as uuid_reg_file:
-            _uuid_registry = yaml.load(uuid_reg_file, Loader=yaml.SafeLoader)
-        return _uuid_registry
-
-    @classmethod
-    def _generate(cls):
-        if os.path.exists(UuidRegistry._uuid_registry_path):
-            return True
-        logging.warning("No uuid registry file detected")
-        logging.debug("Generating uuids registry...")
-        with open(UuidRegistry._uuid_registry_path, 'w') as uuid_reg_file:
-            write_task = yaml.dump(
-                get_uuid_registry_build(),
-                uuid_reg_file,
-                sort_keys=True,
-                indent=2    
-            )
-        logging.info("Generated uuids registry")
-        return False
-
-    @classmethod
-    def load(cls):
-        logging.debug("Loading uuids registry")
-        # Note: Generating registry will not overwrite existing file
-        UuidRegistry._generate()
-        UuidRegistry.data = UuidRegistry._load()
-
-    @classmethod
-    def reload(cls):
-        logging.debug("Reloading uuids registry")
-        UuidRegistry.data = UuidRegistry._load()
-
-    @classmethod
-    def update(new_data):
-        assert(isinstance(new_data, dict))
-        logging.debug("Updating uuids registry")
-        with open(UuidRegistry._uuid_registry_path, 'w') as uuid_reg_file:
-            update_task = yaml.dump(
-                new_data,
-                uuid_reg_file,
-                sort_keys=True,
-                indent=2
-            )
-        UuidRegistry.reload()
 
 
 class GuildRegistry:
@@ -133,9 +71,12 @@ class GuildRegistry:
 
 
 def load_all():
-    registries = [UuidRegistry, GuildRegistry]
+    registries = [GuildRegistry]
     for register in registries:
         try:
             register.load()
         except Exception as e:
             logging.critical(f"Error loading register {register.__name__}: {e}")
+    if not os.path.exists(util.uuid_database.UuidDb._path):
+        util.uuid_database.UuidDb.generate()
+    util.uuid_database.UuidDb.load()
