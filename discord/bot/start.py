@@ -41,6 +41,9 @@ async def main():
     root_logger = logging.getLogger('root')
     root_logger.setLevel(logging.DEBUG)
 
+    requests_logger = logging.getLogger('urllib3')
+    requests_logger.setLevel(level=logging.INFO)
+
     datetime_format = "%Y-%m-%d %H:%M:%S"
     formatter = '%(name)s [%(asctime)s %(levelname)s] %(message)s'
     logging.basicConfig(
