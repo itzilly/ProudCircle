@@ -4,10 +4,11 @@ import logging
 import asyncio
 
 from util import fs
-from util import registers
 from datetime import datetime
 from discord.ext import commands
 from util.config_handler import Settings
+from util.uuid_database import UuidDb
+from util.linked_database import LinkedDatabase
 
 
 # The Proud Circle Discord Bot
@@ -61,8 +62,11 @@ async def main():
     Settings.first_load()
     config = Settings.config
 
-    # Loads all registries
-    registers.load_all()
+    # Load uuid and linked databases
+    UuidDb.generate()
+    UuidDb.load()
+    LinkedDatabase.generate()
+    LinkedDatabase.load()
 
     # Bot Meta-data Setup
     bot_intents = discord.Intents.default()
