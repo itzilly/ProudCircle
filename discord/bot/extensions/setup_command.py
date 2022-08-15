@@ -1,9 +1,9 @@
 import discord
 import logging
+import util.embed_builder
+
 from discord import app_commands
 from discord.ext import commands
-
-import util.embed_builder
 from util.config_handler import Settings
 from util.embed_builder import EmbedBuilder
 
@@ -268,11 +268,11 @@ class SetupCommands(commands.GroupCog, name="setup"):
         # Make all channels invisible unless member is verified
         config = Settings.config
         verified_role_id = config['discord']['role_ids']['verified']
-        # guild_member_role_id = config['discord']['role_ids']['guild_member']
-        # for channel in interaction.guild.channels:
-            # if channel.id is not Settings.config['discord']['channel_ids']['rules']:
-                # await channel.set_permissions(interaction.guild.default_role, view_channel=False)  # @everyone can't see
-                # await channel.set_permissions(interaction.guild.get_role(verified_role_id), view_channel=True)  # @verified can see
+        guild_member_role_id = config['discord']['role_ids']['guild_member']
+        for channel in interaction.guild.channels:
+            if channel.id is not Settings.config['discord']['channel_ids']['rules']:
+                await channel.set_permissions(interaction.guild.default_role, view_channel=False)  # @everyone can't see
+                await channel.set_permissions(interaction.guild.get_role(verified_role_id), view_channel=True)  # @verified can see
         verified_channel = await interaction.guild.create_text_channel(
             name="verification",
             reason="Create verified channel"
