@@ -1,6 +1,5 @@
-import logging
-
 import discord
+import logging
 
 from discord.ext import commands
 from util.config_handler import Settings

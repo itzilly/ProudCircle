@@ -1,8 +1,8 @@
-import logging
 import discord
+import logging
 import requests
-
 import util.config_handler
+
 from util.mcign import MCIGN
 from discord import app_commands
 from discord.ext import commands
@@ -55,6 +55,7 @@ class RankupCommand(commands.Cog):
             position += 1
         message = message + "```"
         await interaction.response.send_message(message)
+
 
 
 async def setup(bot: commands.Bot) -> None:
