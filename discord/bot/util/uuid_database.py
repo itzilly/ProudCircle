@@ -8,16 +8,8 @@ class UuidDb:
     _path = './data/registers/uuids.json'
 
     @staticmethod
-    def generate():
-        if not os.path.exists(UuidDb._path):
-            logging.debug("Generating uuid db")
-            with open(UuidDb._path, 'w') as file:
-                file.write("[]")
-        return True
-
-    @staticmethod
-    def load():
-        logging.debug("Loading uuid db")
+    def reload():
+        logging.debug("Reloading uuid database")
         with open(UuidDb._path) as file:
             _data = json.load(file)
         UuidDb.database = _data
@@ -27,11 +19,31 @@ class UuidDb:
         UuidDb.database.append(entry)
         with open(UuidDb._path, 'w') as file:
             json.dump(UuidDb.database, file, indent=4)
-        UuidDb.load()
+        UuidDb.reload()
 
     @staticmethod
     def add_entries(entries: list):
         UuidDb.database.extend(entries)
         with open(UuidDb._path, 'w') as file:
             json.dump(UuidDb.database, file, indent=4)
-        UuidDb.load()
+        UuidDb.reload()
+
+    @staticmethod
+    def load_database():
+        """Loads uuid database into memory for the first time"""
+        # Generate database if it does not exist
+        if not os.path.exists(UuidDb._path):
+            logging.debug("Generating uuid database")
+            with open(UuidDb._path, 'w') as database_file:
+                database_file.write("[]")
+
+        # Load database into memory
+        logging.debug("Loading uuid database")
+        try:
+            with open(UuidDb._path, 'r') as database_file:
+                UuidDb.database = json.load(database_file)
+        except json.JSONDecodeError:
+            logging.warning("There was an error parsing the uuid database, regenerating")
+            with open(UuidDb._path, 'w') as file:
+                file.write("[]")
+            UuidDb.database = []
