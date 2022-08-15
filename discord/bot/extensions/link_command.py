@@ -1,8 +1,8 @@
-import datetime
 import time
-import logging
 import discord
+import logging
 import requests
+import datetime
 
 from datetime import datetime
 from util.mcign import MCIGN
@@ -27,8 +27,20 @@ class LinkCommand(commands.Cog):
         social_media = player_data.get("socialMedia", {})
         media_links = social_media.get("links", {})
         discord_id = media_links.get("DISCORD", None)
+
+        commands_channel = interaction.guild.get_channel(Settings.config['discord']['channel_ids']['bot_commands'])
+        linking_tutorial_embed = discord.Embed()
+        linking_tutorial_embed.colour = discord.Colour(0xfa1195)
+        linking_tutorial_embed.add_field(
+            name="How to link your account:",
+            value="`#1` Log onto hypixel.net\n"
+                  "`#2` Right click on your head (hotbar)\n"
+                  "`#3` Select 'Social Media' in the GUI\n"
+                  "`#4` Select 'Discord' and paste your discord (eg: illyum#4466) in chat\n"
+                  "`#5` Use /link in {}".format(commands_channel.mention))
+
         if discord_id is None:
-            await interaction.response.send_message("Please link your discord account on hypixel")
+            await interaction.response.send_message(embed=linking_tutorial_embed)
             return False
 
         if discord_id == f"{interaction.user.name}#{interaction.user.discriminator}":
@@ -39,12 +51,14 @@ class LinkCommand(commands.Cog):
                 'discord_discriminator': interaction.user.discriminator,
                 'discord_display_name': interaction.user.display_name,
                 'time_linked': f"{time.time()}",
-                'datetime_linked': f"{datetime.now()}"
+                'datetime_linked': f"{datetime.now()}",
+                'force_linked': False,
+                'force_linked_by': None
             }
             LinkedDatabase.add_entry(database_entry)
             await interaction.response.send_message(f"Linked {player.name} with {discord_id}")
         else:
-            await interaction.response.send_message(f"Please link your discord account on hypixel!")
+            await interaction.response.send_message(embed=linking_tutorial_embed)
 
 
 async def setup(bot):
