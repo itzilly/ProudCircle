@@ -7,8 +7,6 @@ from util import fs
 from datetime import datetime
 from discord.ext import commands
 from util.config_handler import Settings
-from util.uuid_database import UuidDb
-from util.linked_database import LinkedDatabase
 
 
 # The Proud Circle Discord Bot
@@ -23,10 +21,8 @@ class ProudCircleDiscordBot(commands.Bot):
         # Load all extensions: commands, events, tasks, etc
         ext = fs.get_all_extensions()
         for extension in ext:
-            logging.debug(f"Loading extension: {extension}...")
             try:
                 await self.load_extension(extension)
-                logging.debug(f"Loaded extension!")
             except Exception as e:
                 logging.error(f"There was an error loading extension '{extension}': {e}")
         # Sync app commands
@@ -43,7 +39,7 @@ async def main():
     root_logger.setLevel(logging.DEBUG)
 
     requests_logger = logging.getLogger('urllib3')
-    requests_logger.setLevel(level=logging.INFO)
+    requests_logger.setLevel(logging.INFO)
 
     datetime_format = "%Y-%m-%d %H:%M:%S"
     formatter = '%(name)s [%(asctime)s %(levelname)s] %(message)s'
@@ -57,16 +53,9 @@ async def main():
         ]
     )
 
-    # Generate, load, and check the config file
-    # Note: Will NOT override existing config
-    Settings.first_load()
-    config = Settings.config
-
-    # Load uuid and linked databases
-    UuidDb.generate()
-    UuidDb.load()
-    LinkedDatabase.generate()
-    LinkedDatabase.load()
+    # Generate and load all configuration files
+    # (this includes json databases)
+    fs.load_files()
 
     # Bot Meta-data Setup
     bot_intents = discord.Intents.default()
@@ -79,9 +68,14 @@ async def main():
 
     # Start the discord bot
     bot = ProudCircleDiscordBot(intents=bot_intents, command_prefix=bot_pfx, description=bot_description)
-    token = config.get('bot').get('token')
+    token = Settings.config.get('bot', {}).get('token', None)
+    if token is None:
+        logging.critical("No bot token detected! Please enter the bot token in '/data/config.yaml' | bot -> token")
+        exit(2)
+    logging.debug("Awaiting bot...")
     await bot.start(token)
 
 
 if __name__ == "__main__":
+    print("Starting Proud Circle Bot...")
     asyncio.run(main())
