@@ -1,5 +1,5 @@
-import logging
 import discord
+import logging
 
 from discord.ext import commands
 
@@ -40,5 +40,5 @@ class DiscordListener(commands.Cog):
 
 
 async def setup(bot: commands.Bot):
-    logging.debug("Setup 'DiscordListener(commands.Cog)'")
+    logging.debug("Adding Cog: DiscordListener")
     await bot.add_cog(DiscordListener(bot))
