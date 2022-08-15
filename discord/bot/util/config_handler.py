@@ -12,11 +12,11 @@ class Settings:
     def get_settings_build():
         return {
                 'info': {
-                    'config_version': '1.0.1',
+                    'config_version': '1.1.2',
                     'bot_version': 'Pre-v1.0.0'
                 },
                 'bot': {
-                    'token': "No Token"
+                    'token': None
                 },
                 'discord': {
                     'server_id': None,
@@ -35,72 +35,35 @@ class Settings:
                         'everyone': None
                     },
                     'channel_ids': {
-                        'verification': 0,
-                        'welcome': 0,
-                        'leave': 0,
-                        'rules': 0
+                        'verification': None,
+                        'welcome': None,
+                        'leave': None,
+                        'rules': None,
+                        'bot_commands': None
                     },
                     'message_ids': {
                         'verification_id': None
                     }
                 },
                 'hypixel': {
-                    'guid_id': 0,
-                    'api_key': 0
+                    'guid_id': "6177d2d68ea8c9a202fc277a",
+                    'api_key': None
+                },
+                'setup': {
+                    'has_rules': False,
+                    'has_verification': False,
+                    # 'has_'
                 }
             }
 
     @staticmethod
-    def _load_file():
-        """
-        Reads config file stream into python object.
-        """
-        with open(Settings._config_path) as file:
-            data = yaml.safe_load(file)
-        return data
-
-    @staticmethod
-    def _generate_file():
-        """
-        Generates default main configuration file.
-        """
-        with open(Settings._config_path, 'w') as file:
-            yaml.dump(Settings.get_settings_build(), file)
-        logging.info("Generated main configuration file")
-
-    @staticmethod
-    def first_load():
-        """
-        Loads the main configuration for the first time upon run.
-        This should be called on startup every time only once in the
-        program's life.
-        """
-        if Settings.config is not None:
-            return logging.warning("Attempted to first load configuration file again!")
-        if not os.path.exists(Settings._config_path):
-            logging.warning("No configuration file found! NOTE: If this is the first time you're running the bot you can ignore this message.")
-            Settings._generate_file()
-
-        settings = Settings._load_file()
-
-        test = settings['bot']['token']
-
-        if test is None:
-            logging.critical("No bot token detected! Please enter your bot token in '/data/config.yaml' | bot -> token")
-            exit(2)
-        if len(test) < 10:
-            logging.critical("No bot token detected! Please enter your bot token in '/data/config.yaml' | bot -> token")
-            exit(2)
-
-        Settings.config = Settings._load_file()
-
-    @staticmethod
-    def load():
+    def reload():
         """
         Loads configuration data
         """
-        logging.debug("Loading main configuration file")
-        _data = Settings._load_file()
+        logging.debug("Reloading main configuration file")
+        with open(Settings._config_path) as file:
+            _data = yaml.safe_load(file)
         Settings.config = _data
 
     @staticmethod
@@ -112,13 +75,23 @@ class Settings:
         with open(Settings._config_path, 'w') as file:
             yaml.dump(new_config_data, file)
         logging.debug("Configuration file updated")
-        Settings.config = Settings._load_file()
+        Settings.reload()
 
     @staticmethod
-    @DeprecationWarning
-    def update(new_config_data):
-        """
-        Wrapper for update_config for backwards compatibility
-        """
-        logging.warning("Using deprecated method 'update' please use 'update_config'")
-        Settings.update_config(new_config_data)
+    def load_configuration():
+        """Loads the configuration file into memory for the first time"""
+        # Generate file if it does not exist
+        if not os.path.exists(Settings._config_path):
+            logging.info("Generating main configuration file")
+            with open(Settings._config_path, 'w') as file:
+                yaml.dump(Settings.get_settings_build(), file)
+
+        # Load config file into memory
+        logging.debug("Loading main configuration file")
+        with open(Settings._config_path) as file:
+            _data = yaml.safe_load(file)
+        Settings.config = _data
+
+        if _data.get('hypixel').get('api_key') is None:
+            logging.critical("No Hypixel API key detected! Most features will be disabled! Run `/setapikey "
+                             "<YourApiKey>`")
