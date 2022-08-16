@@ -18,7 +18,7 @@ class ProudCircleDiscordBot(commands.Bot):
         logging.info(f"Logged in as {self.user}")
 
     async def setup_hook(self) -> None:
-        # Load all extensions: commands, events, tasks, etc
+        # Load all extensions: commands, events, tasks, etc.
         ext = fs.get_all_extensions()
         for extension in ext:
             try:
