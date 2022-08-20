@@ -39,9 +39,9 @@ class LinkCommand(commands.Cog):
             command = f"SELECT discord_id, player_uuid FROM discord_link WHERE discord_id is {interaction.user.id}"
             execute = self.con.cursor().execute(command)
             response = execute.fetchall()
-            if len(response) is 0:  # Not linked
+            if len(response) == 0:  # Not linked
                 # Logic to link account (save to database)
-                command = f"INSERT INTO discord_link VALUES ({interaction.user.id}, {player_name}, {player_uuid})"
+                command = f"INSERT INTO discord_link VALUES ({interaction.user.id}, '{player_name}', '{player_uuid}')"
                 execute = self.con.cursor().execute(command)
                 await interaction.response.send_message(f"Linked {interaction.user.mention} with {player_name}!")
             else:  # Account has already been linked
@@ -66,7 +66,7 @@ class UnlinkCommand(commands.Cog):
         execute = self.con.execute(command)
         response = execute.fetchall()
         # Command sender account is not linked
-        if len(response) is 0:
+        if len(response) == 0:
             await interaction.response.send_message("Your account is not linked, therefore you can't use this command!")
             return False
         else:
