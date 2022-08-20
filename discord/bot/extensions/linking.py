@@ -6,10 +6,18 @@ import logging
 import requests
 
 from util.mcign import MCIGN
-from datetime import datetime
 from discord import app_commands
 from discord.ext import commands
 from util.config_handler import Settings
+
+
+how_to_link = discord.Embed(colour=discord.Colour(0xfa1195))
+how_to_link.add_field(
+    name="How to link your discord account on hypixel:",
+    value="`#1` Go to any game lobby and right click on your head in your hotbar.\n"
+          "`#2` In the GUI, select 'Social Media'. It looks like a twitter head.\n"
+          "`#3` Left click the discord head in the new popup.\n"
+          "`#4` Copy your discord username#number and paste in game chat!")
 
 
 class LinkCommand(commands.Cog):
@@ -30,7 +38,7 @@ class LinkCommand(commands.Cog):
 
         # No discord handle has been set by player 'username'
         if discord_id is None:
-            await interaction.response.send_message("Please link your discord account on hypixel!")
+            await interaction.response.send_message(embed=how_to_link)
             return False
 
         # Discord id matches command sender
@@ -49,8 +57,9 @@ class LinkCommand(commands.Cog):
                                                         "your account, use /unlink")
         # Discord id is present but does not match command sender
         else:
-            await interaction.response.send_message("Please make sure you've typed the right discord account on your "
-                                                    "hypixel profile!")
+            linking = how_to_link
+            linking.title = "Please make sure you've typed the right discord account on your hypixel profile!"
+            await interaction.response.send_message(embed=linking)
 
 
 class UnlinkCommand(commands.Cog):
@@ -67,12 +76,20 @@ class UnlinkCommand(commands.Cog):
         response = execute.fetchall()
         # Command sender account is not linked
         if len(response) == 0:
-            await interaction.response.send_message("Your account is not linked, therefore you can't use this command!")
+            embed = discord.Embed(
+                colour=discord.Colour(0xf00c27),
+                description="Your account is not linked, therefore you can't use this command!"
+            )
+            await interaction.response.send_message(embed=embed)
             return False
         else:
             command = f"DELETE FROM discord_link WHERE discord_id IS {interaction.user.id}"
             execute = self.con.execute(command)
-            await interaction.response.send_message("Your account was successfully unlinked!")
+            embed = discord.Embed(
+                colour=discord.Colour(0x1bb510),
+                description=":white_mark_check: Your account was successfully unlinked!"
+            )
+            await interaction.response.send_message(embed=embed)
             return True
 
 
