@@ -21,5 +21,5 @@ def load_files():
     uuid_database.UuidDb.load_database()
     linked_database.LinkedDatabase.load_database()
     command = "CREATE TABLE IF NOT EXISTS discord_link (discord_id INTEGER, player_name TEXT, player_uuid TEXT)"
-    connection = sqlite3.connect('./data/discord.js').execute(command)
+    connection = sqlite3.connect('./data/discord.db').execute(command)
     connection.close()
