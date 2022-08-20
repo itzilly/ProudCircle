@@ -136,40 +136,40 @@ class PromoteTask:
         response_message = f"Here are the weekly promotions!\n\n" \
                            f"        {champion.mention}\n" \
                            f"-------------------------------\n" \
-                           f"`#1`   **{first_playername}**: " + '{:,}'.format(first_gexp) + "GEXP\n" \
+                           f"`#1`   **{first_playername}**: " + '{:,}'.format(first_gexp) + " GEXP\n" \
                            f"-------------------------------\n" \
                            f"\n" \
                            f"       {celestial.mention}\n" \
-                           f"`#2` **{second_playername}**: " + '{:,}'.format(second_gexp) + "GEXP\n" \
-                           f"`#3` **{third_playername}**: " + '{:,}'.format(third_gexp) + "GEXP\n" \
+                           f"`#2` **{second_playername}**: " + '{:,}'.format(second_gexp) + " GEXP\n" \
+                           f"`#3` **{third_playername}**: " + '{:,}'.format(third_gexp) + " GEXP\n" \
                            f"\n" \
                            f"       {legend.mention}\n" \
-                           f"`#4` **{fourth_playername}** : " + '{:,}'.format(fourth_gexp) + "GEXP\n" \
-                           f"`#5` **{fifth_playername}** : " + '{:,}'.format(fifth_gexp) + "GEXP\n" \
-                           f"`#6` **{sixth_playername}** : " + '{:,}'.format(sixth_gexp) + "GEXP\n" \
-                           f"`#7` **{seventh_playername}** : " + '{:,}'.format(seventh_gexp) + "GEXP\n" \
-                           f"`#8` **{eighth_playername}** : " + '{:,}'.format(eighth_gexp) + "GEXP\n" \
-                           f"`#9` **{ninth_playername}** : " + '{:,}'.format(ninth_gexp) + "GEXP\n" \
-                           f"`#10` **{tenth_playername}** : " + '{:,}'.format(tenth_gexp) + "GEXP\n\n\n" \
+                           f"`#4` **{fourth_playername}** : " + '{:,}'.format(fourth_gexp) + " GEXP\n" \
+                           f"`#5` **{fifth_playername}** : " + '{:,}'.format(fifth_gexp) + " GEXP\n" \
+                           f"`#6` **{sixth_playername}** : " + '{:,}'.format(sixth_gexp) + " GEXP\n" \
+                           f"`#7` **{seventh_playername}** : " + '{:,}'.format(seventh_gexp) + " GEXP\n" \
+                           f"`#8` **{eighth_playername}** : " + '{:,}'.format(eighth_gexp) + " GEXP\n" \
+                           f"`#9` **{ninth_playername}** : " + '{:,}'.format(ninth_gexp) + " GEXP\n" \
+                           f"`#10` **{tenth_playername}** : " + '{:,}'.format(tenth_gexp) + " GEXP\n\n\n" \
                            f"Congratulations to everyone who achieved a rank!"
 
         response_value = f"        {champion.mention}\n" \
                          f"-------------------------------\n" \
-                         f"`#1`   **{first_playername}**: " + '{:,}'.format(first_gexp) + "GEXP\n" \
+                         f"`#1`   **{first_playername}**: " + '{:,}'.format(first_gexp) + " GEXP\n" \
                          f"-------------------------------\n" \
                          f"\n" \
                          f"       {celestial.mention}\n" \
-                         f"`#2` **{second_playername}**: " + '{:,}'.format(second_gexp) + "GEXP\n" \
-                         f"`#3` **{third_playername}**: " + '{:,}'.format(third_gexp) + "GEXP\n" \
+                         f"`#2` **{second_playername}**: " + '{:,}'.format(second_gexp) + " GEXP\n" \
+                         f"`#3` **{third_playername}**: " + '{:,}'.format(third_gexp) + " GEXP\n" \
                          f"\n" \
                          f"       {legend.mention}\n" \
-                         f"`#4` **{fourth_playername}** : " + '{:,}'.format(fourth_gexp) + "GEXP\n" \
-                         f"`#5` **{fifth_playername}** : " + '{:,}'.format(fifth_gexp) + "GEXP\n" \
-                         f"`#6` **{sixth_playername}** : " + '{:,}'.format(sixth_gexp) + "GEXP\n" \
-                         f"`#7` **{seventh_playername}** : " + '{:,}'.format(seventh_gexp) + "GEXP\n" \
-                         f"`#8` **{eighth_playername}** : " + '{:,}'.format(eighth_gexp) + "GEXP\n" \
-                         f"`#9` **{ninth_playername}** : " + '{:,}'.format(ninth_gexp) + "GEXP\n" \
-                         f"`#10` **{tenth_playername}** : " + '{:,}'.format(tenth_gexp) + "GEXP\n\n\n" \
+                         f"`#4` **{fourth_playername}** : " + '{:,}'.format(fourth_gexp) + " GEXP\n" \
+                         f"`#5` **{fifth_playername}** : " + '{:,}'.format(fifth_gexp) + " GEXP\n" \
+                         f"`#6` **{sixth_playername}** : " + '{:,}'.format(sixth_gexp) + " GEXP\n" \
+                         f"`#7` **{seventh_playername}** : " + '{:,}'.format(seventh_gexp) + " GEXP\n" \
+                         f"`#8` **{eighth_playername}** : " + '{:,}'.format(eighth_gexp) + " GEXP\n" \
+                         f"`#9` **{ninth_playername}** : " + '{:,}'.format(ninth_gexp) + " GEXP\n" \
+                         f"`#10` **{tenth_playername}** : " + '{:,}'.format(tenth_gexp) + " GEXP\n\n\n" \
                          f"Congratulations to everyone who achieved a rank!"
 
         response_embed_files = []
@@ -182,21 +182,17 @@ class PromoteTask:
 
         # Demotions
         for user in interaction.guild.members:
-            try:
+            if champion in user.roles:
                 await user.remove_roles(champion)
                 logging.debug(f"Removed role @champion from {user.display_name}")
-            except Exception as e:
-                logging.error(e)
-            try:
+
+            if celestial in user.roles:
                 await user.remove_roles(celestial)
                 logging.debug(f"Removed role @celestial from {user.display_name}")
-            except Exception as e:
-                logging.error(e)
-            try:
+
+            if legend in user.roles:
                 await user.remove_roles(legend)
                 logging.debug(f"Removed role @legend from {user.display_name}")
-            except Exception as e:
-                logging.error(e)
 
         # Promotions
         for todo in promotions:
@@ -204,4 +200,5 @@ class PromoteTask:
         # await interaction.response.send_message(response_message)
         await interaction.response.send_message(embed=response_embed, files=response_embed_files)
 
+        logging.debug("Finished task: Promotions")
         return True
