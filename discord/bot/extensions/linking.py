@@ -5,6 +5,7 @@ import discord
 import logging
 import requests
 
+from util import fs
 from util.mcign import MCIGN
 from discord import app_commands
 from discord.ext import commands
@@ -23,7 +24,6 @@ how_to_link.add_field(
 class LinkCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.con = sqlite3.connect('./data/discord.db')
 
     @app_commands.command(name="link", description="Link your account to this discord server")
     async def link(self, interaction: discord.Interaction, username: str):
@@ -45,16 +45,24 @@ class LinkCommand(commands.Cog):
         if discord_id == f"{interaction.user.name}#{interaction.user.discriminator}":
             # Check if account has already been linked with that username/discord handle
             command = f"SELECT discord_id, player_uuid FROM discord_link WHERE discord_id is {interaction.user.id}"
-            execute = self.con.cursor().execute(command)
+            execute = fs.con.execute(command)
             response = execute.fetchall()
             if len(response) == 0:  # Not linked
                 # Logic to link account (save to database)
                 command = f"INSERT INTO discord_link VALUES ({interaction.user.id}, '{player_name}', '{player_uuid}')"
-                execute = self.con.cursor().execute(command)
-                await interaction.response.send_message(f"Linked {interaction.user.mention} with {player_name}!")
+                execute = fs.con.cursor().execute(command)
+                fs.con.commit()
+                embed = discord.Embed(
+                    colour=discord.Colour(0xf00c27),
+                    description=f"Linked {interaction.user.mention} with {player_name}!"
+                )
+                await interaction.response.send_message(embed=embed)
             else:  # Account has already been linked
-                await interaction.response.send_message("Your account is already linked! If you would like to unlink "
-                                                        "your account, use /unlink")
+                embed = discord.Embed(
+                    colour=discord.Colour(0xf00c27),
+                    description="Your account is already linked! If you would like to unlink your account, use /unlink"
+                )
+                await interaction.response.send_message(embed=embed)
         # Discord id is present but does not match command sender
         else:
             linking = how_to_link
@@ -65,14 +73,13 @@ class LinkCommand(commands.Cog):
 class UnlinkCommand(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.con = sqlite3.connect('./data/discord.db')
 
     @app_commands.command(name="unlink", description="Unlink your account from this discord server")
     async def unlink(self, interaction: discord.Interaction):
         """Unlink discord account with minecraft account"""
         # Check if account is linked or not
         command = f"SELECT * FROM discord_link WHERE discord_id IS {interaction.user.id}"
-        execute = self.con.execute(command)
+        execute = fs.con.execute(command)
         response = execute.fetchall()
         # Command sender account is not linked
         if len(response) == 0:
@@ -84,10 +91,11 @@ class UnlinkCommand(commands.Cog):
             return False
         else:
             command = f"DELETE FROM discord_link WHERE discord_id IS {interaction.user.id}"
-            execute = self.con.execute(command)
+            execute = fs.con.execute(command)
+            fs.con.commit()
             embed = discord.Embed(
                 colour=discord.Colour(0x1bb510),
-                description=":white_mark_check: Your account was successfully unlinked!"
+                description=":white_check_mark: Your account was successfully unlinked!"
             )
             await interaction.response.send_message(embed=embed)
             return True
