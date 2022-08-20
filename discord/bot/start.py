@@ -33,7 +33,7 @@ class ProudCircleDiscordBot(commands.Bot):
 async def main():
     # Setup logger
     discord_logger = logging.getLogger('discord')
-    discord_logger.setLevel(logging.WARNING)
+    discord_logger.setLevel(logging.INFO)
 
     root_logger = logging.getLogger('root')
     root_logger.setLevel(logging.DEBUG)
@@ -63,6 +63,11 @@ async def main():
     bot_intents.members = True
     bot_intents.guilds = True
     bot_intents.reactions = True
+    bot_intents.dm_messages = True
+    bot_intents.dm_typing = True
+    bot_intents.dm_reactions = True
+    bot_intents.invites = True
+    bot_intents.messages = True
     bot_pfx = commands.when_mentioned
     bot_description = "A Discord Bot for the Proud Circle Guild!"
 
