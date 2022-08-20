@@ -23,3 +23,6 @@ def load_files():
     command = "CREATE TABLE IF NOT EXISTS discord_link (discord_id INTEGER, player_name TEXT, player_uuid TEXT)"
     connection = sqlite3.connect('./data/discord.db').execute(command)
     connection.close()
+
+
+con = sqlite3.connect('./data/discord.db')
