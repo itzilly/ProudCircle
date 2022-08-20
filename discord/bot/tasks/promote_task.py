@@ -1,4 +1,5 @@
 import pytz
+import sqlite3
 import logging
 import discord
 import requests
@@ -15,6 +16,7 @@ class PromoteTask:
         self.name = "Promotion Task"
         self.errored = False
         self.error_embed = None
+        self.con = sqlite3.connect('./data/discord.db')
 
     async def run(self, interaction: discord.Interaction):
         logging.debug("Running task: Promotions")
@@ -85,52 +87,112 @@ class PromoteTask:
                 case 1:
                     first_gexp = member.get('weekly_gexp')
                     first_playername = member.get('name')
-                    first_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        first_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        first_playername = member.get('name').replace("_", "\\_")
                     position += 1
                 case 2:
                     second_gexp = member.get('weekly_gexp')
                     second_playername = member.get('name')
-                    second_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        second_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        second_playername = member.get('name').replace("_", "\\_")
                     position += 1
                 case 3:
                     third_gexp = member.get('weekly_gexp')
                     third_playername = member.get('name')
-                    third_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        third_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        third_playername = member.get('name').replace("_", "\\_")
                     position += 1
                 case 4:
                     fourth_gexp = member.get('weekly_gexp')
                     fourth_playername = member.get('name')
-                    fourth_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        fourth_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        fourth_playername = member.get('name').replace("_", "\\_")
                     position += 1
                 case 5:
                     fifth_gexp = member.get('weekly_gexp')
                     fifth_playername = member.get('name')
-                    fifth_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        fifth_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        fifth_playername = member.get('name').replace("_", "\\_")
                     position += 1
                 case 6:
                     sixth_gexp = member.get('weekly_gexp')
                     sixth_playername = member.get('name')
-                    sixth_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        sixth_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        sixth_playername = member.get('name').replace("_", "\\_")
                     position += 1
                 case 7:
                     seventh_gexp = member.get('weekly_gexp')
                     seventh_playername = member.get('name')
-                    seventh_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        seventh_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        seventh_playername = member.get('name').replace("_", "\\_")
                     position += 1
                 case 8:
                     eighth_gexp = member.get('weekly_gexp')
                     eighth_playername = member.get('name')
-                    eighth_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        eighth_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        eighth_playername = member.get('name').replace("_", "\\_")
                     position += 1
                 case 9:
                     ninth_gexp = member.get('weekly_gexp')
                     ninth_playername = member.get('name')
-                    ninth_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        ninth_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        ninth_playername = member.get('name').replace("_", "\\_")
                     position += 1
                 case 10:
                     tenth_gexp = member.get('weekly_gexp')
                     tenth_playername = member.get('name')
-                    tenth_playername = member.get('name').replace("_", "\\_")
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    execute = self.con.execute(command)
+                    response = execute.fetchall()
+                    if len(response) is not None:
+                        tenth_playername = interaction.guild.get_member(response[0]).mention
+                    else:
+                        tenth_playername = member.get('name').replace("_", "\\_")
                     position += 1
 
         response_message = f"Here are the weekly promotions!\n\n" \
