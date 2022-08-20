@@ -15,6 +15,8 @@ class RunCommand(commands.GroupCog, name="run"):
 
     @app_commands.command(name="promotions", description="Calculates weekly GEXP and promotes members")
     async def promotion_task(self, interaction: discord.Interaction, flags: str=None):
+        subcommand_name = "/run promotions"
+        logging.debug(f"COMMANDS | User {interaction.user.id} ran command '{subcommand_name}'")
         if not util.command_helper.check_permission(interaction.user, level="any"):
             await interaction.response.send_message(embed=util.command_helper.no_perm_embed())
         promotions_task = PromoteTask()
