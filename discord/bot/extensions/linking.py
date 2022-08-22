@@ -28,6 +28,7 @@ class LinkCommand(commands.Cog):
     @app_commands.command(name="link", description="Link your account to this discord server")
     async def link(self, interaction: discord.Interaction, username: str):
         """Links discord account with minecraft account"""
+        logging.debug(f"User {interaction.user.name} ({interaction.user.id}) ran command '/link'")
         key = Settings.config['hypixel']['api_key']
         player = MCIGN(id=username)
         player_uuid = player.uuid
