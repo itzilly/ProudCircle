@@ -87,10 +87,10 @@ class PromoteTask:
                 case 1:
                     first_gexp = member.get('weekly_gexp')
                     first_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         first_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         first_playername = member.get('name').replace("_", "\\_")
@@ -98,10 +98,10 @@ class PromoteTask:
                 case 2:
                     second_gexp = member.get('weekly_gexp')
                     second_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         second_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         second_playername = member.get('name').replace("_", "\\_")
@@ -109,10 +109,10 @@ class PromoteTask:
                 case 3:
                     third_gexp = member.get('weekly_gexp')
                     third_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         third_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         third_playername = member.get('name').replace("_", "\\_")
@@ -120,10 +120,10 @@ class PromoteTask:
                 case 4:
                     fourth_gexp = member.get('weekly_gexp')
                     fourth_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         fourth_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         fourth_playername = member.get('name').replace("_", "\\_")
@@ -131,10 +131,10 @@ class PromoteTask:
                 case 5:
                     fifth_gexp = member.get('weekly_gexp')
                     fifth_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         fifth_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         fifth_playername = member.get('name').replace("_", "\\_")
@@ -142,10 +142,10 @@ class PromoteTask:
                 case 6:
                     sixth_gexp = member.get('weekly_gexp')
                     sixth_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         sixth_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         sixth_playername = member.get('name').replace("_", "\\_")
@@ -153,10 +153,10 @@ class PromoteTask:
                 case 7:
                     seventh_gexp = member.get('weekly_gexp')
                     seventh_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         seventh_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         seventh_playername = member.get('name').replace("_", "\\_")
@@ -164,10 +164,10 @@ class PromoteTask:
                 case 8:
                     eighth_gexp = member.get('weekly_gexp')
                     eighth_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         eighth_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         eighth_playername = member.get('name').replace("_", "\\_")
@@ -175,10 +175,10 @@ class PromoteTask:
                 case 9:
                     ninth_gexp = member.get('weekly_gexp')
                     ninth_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         ninth_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         ninth_playername = member.get('name').replace("_", "\\_")
@@ -186,10 +186,10 @@ class PromoteTask:
                 case 10:
                     tenth_gexp = member.get('weekly_gexp')
                     tenth_playername = member.get('name')
-                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS {member.get('uuid')}"
+                    command = f"SELECT discord_id FROM discord_link WHERE player_uuid IS '{member.get('uuid')}'"
                     execute = self.con.execute(command)
-                    response = execute.fetchall()
-                    if len(response) is not None:
+                    response = execute.fetchone()
+                    if response is not None:
                         tenth_playername = interaction.guild.get_member(response[0]).mention
                     else:
                         tenth_playername = member.get('name').replace("_", "\\_")
@@ -232,7 +232,7 @@ class PromoteTask:
                          f"`#8` **{eighth_playername}** : " + '{:,}'.format(eighth_gexp) + " GEXP\n" \
                          f"`#9` **{ninth_playername}** : " + '{:,}'.format(ninth_gexp) + " GEXP\n" \
                          f"`#10` **{tenth_playername}** : " + '{:,}'.format(tenth_gexp) + " GEXP\n\n\n" \
-                         f"Congratulations to everyone who achieved a rank!"
+                         f"Congratulations to @everyone who achieved a rank!"
 
         response_embed_files = []
         response_embed = discord.Embed(title="Weekly rank promotions!")
@@ -259,7 +259,6 @@ class PromoteTask:
         # Promotions
         for todo in promotions:
             await interaction.guild.get_member(todo.get('user_id')).add_roles(todo.get('role_id'))
-        # await interaction.response.send_message(response_message)
         await interaction.response.send_message(embed=response_embed, files=response_embed_files)
 
         logging.debug("Finished task: Promotions")
