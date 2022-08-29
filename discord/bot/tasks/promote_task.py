@@ -179,7 +179,7 @@ class PromoteTask:
 
         # Promotions
         for task in promotions:
-            _discord_id = task.get('discord_id')
+            _discord_id = task.get('member_id')
             _role_id = task.get('role_id')
             await interaction.guild.get_member(_discord_id).add_roles(_role_id)
         await interaction.response.send_message(embed=response_embed, files=response_embed_files)
