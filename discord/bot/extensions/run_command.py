@@ -23,7 +23,7 @@ class RunCommand(commands.GroupCog, name="run"):
             return
         promotions_task = PromoteTask()
         await promotions_task.run(interaction)
-        if promotions_task.errored:
+        if promotions_task.did_error:
             await interaction.response.send_message(embed=promotions_task.error_embed)
 
 
