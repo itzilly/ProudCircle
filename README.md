@@ -1,5 +1,5 @@
 # ProudCircle
-All files/code for Proud Circle Community projects! 
+All files/code for Proud Circle Discord Bot!
 
 # Discord Bot:
 The Proud Circle Guild (https://plancke.io/hypixel/guild/player/illyum) has a public discord community! In this guild, players with the most weekly gexp are given certain roles following this criteria:
