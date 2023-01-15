@@ -1,5 +1,7 @@
-/discord/bot/.idea/
-/discord/bot/extensions/__pycache__.pyc
-/discord/bot/util/__pycache__.pyc
-/discord/bot/extensions/coins_command.py
-/mineflayer
+*.db
+*.log
+*.gz
+
+**/__pycache__/
+
+/env
