@@ -1,3 +1,4 @@
+aiohttp~=3.8.3
 git+https://github.com/Rapptz/discord.py#egg=discord.py[voice]
 pytz==2022.1
 PyYAML==6.0
