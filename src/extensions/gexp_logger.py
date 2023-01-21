@@ -102,7 +102,7 @@ class GexpLogger(commands.Cog):
 
 		start_time = time.perf_counter()
 		task_id = uuid.uuid4()
-		logging.debug(f"Running GexpLogger (id: {task_id})")
+		logging.info(f"Running GexpLogger (id: {task_id})")
 		start_message = await self.bot.get_guild(1031393503902715985).get_channel(1061815307473268827)\
 			.send(
 			embed=embed_lib.GexpLoggerStartEmbed(
