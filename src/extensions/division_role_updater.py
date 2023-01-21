@@ -12,57 +12,78 @@ from util.local import XP_DIVISION_DATA_PATH
 class DivisionRoleUpdater(commands.Cog):
 	def __init__(self, bot: commands.Bot, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+
 		self.bot = bot
+
 		# self.role_data = local.LOCAL_DATA.xp_division_data
 		self.cursor = local.LOCAL_DATA.cursor
+		self.server_id = int(local.LOCAL_DATA.config.get_setting("server_id"))
+		self.server = self.bot.get_guild(self.server_id)
+		with open(XP_DIVISION_DATA_PATH, encoding='utf-8') as json_file:
+			self.roles_data = json.load(json_file)
+		self.all_division_role_ids = []
 
 	def get_member_xp(self, member):
 		cmd = "SELECT uuid, amount FROM expHistory ORDER BY date DESC"
 
-	async def run(self, interaction):
-		server_id = int(local.LOCAL_DATA.config.get_setting("server_id"))
-		server = self.bot.get_guild(server_id)
+	async def update_member_division(self, member):
+		uuid = member[0]
+		cmd = "SELECT SUM(amount) FROM expHistory WHERE uuid IS ?"
+		amount_query = self.cursor.execute(cmd, (uuid,)).fetchone()
+		amount = int(amount_query[0])
 
+		discord_link = local.LOCAL_DATA.discord_link.get_link(uuid)
+		if discord_link is None:
+			return
+		discord_member = self.bot.get_guild(self.server_id).get_member(discord_link.discord_id)
+		if discord_member is None:
+			logging.error(f"Discord member ({discord_link.discord_id}) not found, please view latest log file for more details")
+			logging.debug(f"link.row_id : {discord_link.row_id}")
+			logging.debug(f"link.uuid : {discord_link.uuid}")
+			logging.debug(f"link.discord_id : {discord_link.discord_id}")
+			logging.debug(f"link.discord_username: {discord_link.discord_username}")
+			logging.debug(f"link.linked_at: {discord_link.linked_at}")
+
+		# Add the <-- GEXP --> Cosmetic role (cosmetic role id: 1055844799015563274)
+		cosmetic_role_id = 1055844799015563274
+		if self.bot.get_guild(self.server_id).get_role(cosmetic_role_id) not in discord_member.roles:
+			await discord_member.add_roles(self.bot.get_guild(self.server_id).get_role(cosmetic_role_id))
+
+		# Find the highest role the member qualifies for
+		highest_role = None
+		for role in self.roles_data["roles"]:
+			if amount >= role["required_amount"]:
+				if highest_role is None or role["required_amount"] > highest_role["required_amount"]:
+					highest_role = role
+		logging.debug(f"Adding role_id: {highest_role} | {discord_link.discord_id}")
+		given_role = self.bot.get_guild(self.server_id).get_role(highest_role["role_id"])
+		await discord_member.add_roles(given_role)
+
+		# Remove all lower roles from the member
+		if highest_role is not None:
+			for role in discord_member.roles:
+				if role.id in self.all_division_role_ids and role.id != highest_role["role_id"]:
+					remove_role = self.bot.get_guild(self.server_id).get_role(role.id)
+					logging.debug(f"Removing role_id: {role.id} | {discord_link.discord_id}")
+					await discord_member.remove_roles(remove_role)
+
+	async def run(self, interaction):
 		with open(XP_DIVISION_DATA_PATH, encoding='utf-8') as json_file:
 			roles_data = json.load(json_file)
 
 		cmd = "SELECT DISTINCT uuid FROM expHistory"
 		table_members = self.cursor.execute(cmd).fetchall()
 
-		all_division_role_ids = []
 		for role in roles_data["roles"]:
-			all_division_role_ids.append(role["role_id"])
+			self.all_division_role_ids.append(role["role_id"])
 
 		for member in table_members:
-			uuid = member[0]
-			cmd = "SELECT SUM(amount) FROM expHistory WHERE uuid IS ?"
-			amount_query = self.cursor.execute(cmd, (uuid,)).fetchone()
-			amount = int(amount_query[0])
+			try:
+				await self.update_member_division(member)
+			except Exception as e:
+				logging.critical(e)
 
-			discord_link = local.LOCAL_DATA.discord_link.get_link(uuid)
-			if discord_link is None:
-				continue
-			discord_member = self.bot.get_guild(server_id).get_member(discord_link.discord_id)
-
-			# Find the highest role the member qualifies for
-			highest_role = None
-			for role in roles_data["roles"]:
-				if amount >= role["required_amount"]:
-					if highest_role is None or role["required_amount"] > highest_role["required_amount"]:
-						highest_role = role
-			logging.debug(f"Adding role_id: {highest_role} | {discord_link.discord_id}")
-			given_role = self.bot.get_guild(server_id).get_role(highest_role["role_id"])
-			await discord_member.add_roles(given_role)
-
-			# Remove all lower roles from the member
-			if highest_role is not None:
-				for role in discord_member.roles:
-					if role.id in all_division_role_ids and role.id != highest_role["role_id"]:
-						remove_role = self.bot.get_guild(server_id).get_role(role.id)
-						logging.debug(f"Removing role_id: {role.id} | {discord_link.discord_id}")
-						await discord_member.remove_roles(remove_role)
-					if self.bot.get_guild(server_id).get_role(1055844799015563274) not in discord_member.roles:
-						await discord_member.add_roles(self.bot.get_guild(server_id).get_role(1055844799015563274))
+		logging.info("Completed updating divisions!")
 
 	@app_commands.command(name="update-divisions", description="Run the divisions update task")
 	async def update_divisions_command(self, interaction: discord.Interaction):
