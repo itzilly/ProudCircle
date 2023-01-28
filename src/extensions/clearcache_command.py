@@ -13,7 +13,7 @@ class ClearCacheCommand(commands.Cog):
 		self.bot = bot
 		self.local_data = local.LOCAL_DATA
 
-	@app_commands.command(name="clearcache", description="Remove a cache (admins only)")
+	@app_commands.command(name="clearcache", description="Remove a cache (Admins Only)")
 	async def ping(self, interaction: discord.Interaction, cache_name: str):
 		has_permissions = await ensure_bot_permissions(interaction, send_deny_response=True)
 		if not has_permissions:
