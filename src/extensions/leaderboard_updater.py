@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import time
 
 import discord
 from discord import app_commands
@@ -159,6 +160,28 @@ class LeaderboardUpdater(commands.Cog):
 			logging.error(e)
 			return False
 
+	@app_commands.command(name="update-divisions-leaderboard", description="Force-update the divisions leaderboard (Admins Only)")
+	async def update_divisions_leaderboard_command(self, interaction: discord.Interaction) -> None:
+		has_permissions = await ensure_bot_permissions(interaction, send_deny_response=True)
+		if not has_permissions:
+			return
+
+		if self.division_leaderboard_task.is_running():
+			response_embed = discord.Embed()
+			response_embed.colour = discord.Colour(0xa6072c)
+			response_embed.description = "This task is already running!"
+			await interaction.response.send_message(embed=response_embed)
+			return
+
+		logging.debug("Force-updating divisions leaderboard...")
+		await interaction.response.defer()
+		start_time = time.perf_counter()
+		await self.update_division_leaderboard()
+		end_time = time.perf_counter()
+		response_embed = discord.Embed()
+		response_embed.colour = discord.Colour(0x08a169)
+		response_embed.description = f"Finished in f{end_time - start_time} seconds"
+		await interaction.response.send_message(embed=response_embed)
 
 	async def order_members_by_highest_role(self) -> list:
 		data = []
