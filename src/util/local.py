@@ -28,7 +28,8 @@ class LocalData:
 		self.extensions = []
 		self.uuid_cache = UuidCache(self.cursor)
 		self.discord_link = DiscordLink(self.cursor)
-		# self.xp_division_data = XpDivisionData()
+
+	# self.xp_division_data = XpDivisionData()
 
 	def update_tables(self):
 		logging.debug("Updating tables")
@@ -102,26 +103,30 @@ class ConfigHandler:
 		self.cursor.execute("PRAGMA table_info(config)")
 		columns = [column[1] for column in self.cursor.fetchall()]
 
-		if "bot_token" not in columns:
-			self.add_setting("bot_token")
-		if "api_key" not in columns:
-			self.add_setting("api_key")
-		if "guild_id" not in columns:
-			self.add_setting("guild_id")
-		if "bot_admin_role_id" not in columns:
-			self.add_setting("bot_admin_role_id")
-		if "server_id" not in columns:
-			self.add_setting("server_id")
-		if "log_channel" not in columns:
-			self.add_setting("log_channel")
+		settings = []
+		settings.append("bot_token")
+		settings.append("api_key")
+		settings.append("guild_id")
+		settings.append("bot_admin_role_id")
+		settings.append("server_id")
+		settings.append("log_channel")
+		settings.append("leaderboard_channel")
+		settings.append("lb_division_id")
+		settings.append("lb_lifetime_gexp_id")
+		settings.append("lb_yearly_gexp_id")
+		settings.append("lb_monthly_gexp_id")
+		settings.append("lb_weekly_gexp_id")
+		settings.append("lb_daily_gexp_id")
 
-		cmd = "SELECT * FROM config"
-		result = self.cursor.execute(cmd).fetchall()
-		if len(result) < 1:
-			cmd = "INSERT INTO config (bot_token, api_key, guild_id, bot_admin_role_id, server_id, log_channel) VALUES " \
-				"(null, null, null, null, null, null)"
-			self.cursor.execute(cmd)
-			self.conn.commit()
+		for setting in settings:
+			if setting not in columns:
+				self.add_setting(setting)
+
+		columns = ', '.join(settings)
+		values = ', '.join(['null'] * len(settings))
+		cmd = f"INSERT INTO config ({columns}) VALUES ({values})"
+		self.cursor.execute(cmd)
+		self.conn.commit()
 
 
 class UuidCache:
