@@ -148,3 +148,19 @@ class SuccessfullyForceLinkedEmbed(discord.Embed):
 		super().__init__()
 		self.colour = discord.Colour(0x0c70f2)
 		self.description = f"Successfully linked {username} to `{member.name}#{member.discriminator}`"
+
+
+class DivisionUpdateFinishWebhookEmbed(discord.Embed):
+	def __init__(self, members_updated_count: int, errors: int):
+		super().__init__()
+		self.colour = discord.Colour(0x13a83a)
+		self.title = "Division Update Complete!"
+		self.add_field(name=f"Members Updated:", value=f"{members_updated_count}")
+		self.add_field(name=f"Handled Errors:", value=f"{errors}")
+
+
+class UnknownErrorEmbed(discord.Embed):
+	def __init__(self):
+		super().__init__()
+		self.title = "Unknown Error"
+		self.description = "Please refer to latest log file for more information"
