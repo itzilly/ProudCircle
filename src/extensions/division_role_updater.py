@@ -2,11 +2,15 @@ import json
 import discord
 import logging
 
-from util import local, embed_lib
+from util import local, embed_lib, log_link
 from discord import app_commands
 from discord.ext import commands
 
 from util.local import XP_DIVISION_DATA_PATH
+
+
+def rgb_to_decimal(r, g, b):
+	return (r << 16) + (g << 8) + b
 
 
 class DivisionRoleUpdater(commands.Cog):
@@ -22,6 +26,9 @@ class DivisionRoleUpdater(commands.Cog):
 		with open(XP_DIVISION_DATA_PATH, encoding='utf-8') as json_file:
 			self.roles_data = json.load(json_file)
 		self.all_division_role_ids = []
+
+		self.members_updated = 0
+		self.errors = 0
 
 	def get_member_xp(self, member):
 		cmd = "SELECT uuid, amount FROM expHistory ORDER BY date DESC"
@@ -43,10 +50,13 @@ class DivisionRoleUpdater(commands.Cog):
 			logging.debug(f"link.discord_id : {discord_link.discord_id}")
 			logging.debug(f"link.discord_username: {discord_link.discord_username}")
 			logging.debug(f"link.linked_at: {discord_link.linked_at}")
+			self.errors = self.errors + 1
+			return
 
 		# Add the <-- GEXP --> Cosmetic role (cosmetic role id: 1055844799015563274)
 		cosmetic_role_id = 1055844799015563274
 		if self.bot.get_guild(self.server_id).get_role(cosmetic_role_id) not in discord_member.roles:
+			logging.debug(f"Adding cosmetic role to {discord_member.name}")
 			await discord_member.add_roles(self.bot.get_guild(self.server_id).get_role(cosmetic_role_id))
 
 		# Find the highest role the member qualifies for
@@ -57,7 +67,12 @@ class DivisionRoleUpdater(commands.Cog):
 					highest_role = role
 		logging.debug(f"Adding role_id: {highest_role} | {discord_link.discord_id}")
 		given_role = self.bot.get_guild(self.server_id).get_role(highest_role["role_id"])
-		await discord_member.add_roles(given_role)
+
+		# Only update roles if the member does not already have the correct role
+		if given_role not in discord_member.roles:
+			logging.debug(f"Promoting {discord_member.name} to {given_role.name}")
+			self.members_updated = self.members_updated + 1
+			await discord_member.add_roles(given_role)
 
 		# Remove all lower roles from the member
 		if highest_role is not None:
@@ -68,6 +83,9 @@ class DivisionRoleUpdater(commands.Cog):
 					await discord_member.remove_roles(remove_role)
 
 	async def run(self, interaction):
+		self.members_updated = 0
+		self.errors = 0
+
 		with open(XP_DIVISION_DATA_PATH, encoding='utf-8') as json_file:
 			roles_data = json.load(json_file)
 
@@ -84,6 +102,24 @@ class DivisionRoleUpdater(commands.Cog):
 				logging.critical(e)
 
 		logging.info("Completed updating divisions!")
+
+		embed_data = {
+			"title": "Run Completion:",
+			"description": "Updated Divisions",
+			"color": rgb_to_decimal(77, 24, 214),
+			"fields": [
+				{
+					"name": "Members Updated:",
+					"value": f"{self.members_updated}"
+				},
+				{
+					"name": "Handled Errors:",
+					"value": f"{self.errors}"
+				}
+			]
+		}
+
+		log_link.task_webhook(embed_data)
 
 	@app_commands.command(name="update-divisions", description="Run the divisions update task")
 	async def update_divisions_command(self, interaction: discord.Interaction):
