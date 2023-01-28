@@ -166,13 +166,6 @@ class LeaderboardUpdater(commands.Cog):
 		if not has_permissions:
 			return
 
-		if self.division_leaderboard_task.is_running():
-			response_embed = discord.Embed()
-			response_embed.colour = discord.Colour(0xa6072c)
-			response_embed.description = "This task is already running!"
-			await interaction.response.send_message(embed=response_embed)
-			return
-
 		logging.debug("Force-updating divisions leaderboard...")
 		await interaction.response.defer()
 		start_time = time.perf_counter()
