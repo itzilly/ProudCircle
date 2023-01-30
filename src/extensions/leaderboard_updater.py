@@ -54,11 +54,13 @@ class LeaderboardUpdater(commands.Cog):
 		lb_channel_id = self.config.get_setting("leaderboard_channel")
 		if lb_channel_id is not None:
 			self.lb_channel = self.bot.get_guild(self.server_id).get_channel(int(lb_channel_id))
-		self.setup_channel_task.stop()
 
-		self.lb_division_message = self.lb_channel.guild.fetch_channel(int(self.lb_division_message_id))
+		self.lb_division_message = await self.lb_channel.fetch_message(int(self.lb_division_message_id))
 		if self.lb_division_message is not None:
+			logging.debug("Activating Division Leaderboard Task")
 			self.division_leaderboard_task.start()
+
+		self.setup_channel_task.stop()
 
 	@setup_channel_task.before_loop
 	async def before_setup_channel_task(self):
@@ -120,8 +122,9 @@ class LeaderboardUpdater(commands.Cog):
 	async def division_leaderboard_task(self) -> None:
 		if not self.has_run_divisions:
 			self.has_run_divisions = True
-			logging.debug("LeaderboardUpdater: Skipping first run (divisions)")
+			logging.info("LeaderboardUpdater: Skipping first run (divisions)")
 			return
+		logging.debug("LeaderboardUpdater: Running Task")
 		await self.update_division_leaderboard()
 
 	@division_leaderboard_task.before_loop
@@ -129,6 +132,7 @@ class LeaderboardUpdater(commands.Cog):
 		await self.bot.wait_until_ready()
 
 	async def update_division_leaderboard(self) -> bool:
+		logging.info("Updating Division Leaderboard")
 		# TODO: Only add players if they are currently in the guild
 		try:
 			division_data = await self.order_members_by_highest_role()
