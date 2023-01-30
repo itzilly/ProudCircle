@@ -122,11 +122,14 @@ class ConfigHandler:
 			if setting not in columns:
 				self.add_setting(setting)
 
-		columns = ', '.join(settings)
-		values = ', '.join(['null'] * len(settings))
-		cmd = f"INSERT INTO config ({columns}) VALUES ({values})"
-		self.cursor.execute(cmd)
-		self.conn.commit()
+		cmd = "SELECT * FROM config"
+		result = self.cursor.execute(cmd).fetchall()
+		if len(result) < 1:
+			columns = ', '.join(settings)
+			values = ', '.join(['null'] * len(settings))
+			cmd = f"INSERT INTO config ({columns}) VALUES ({values})"
+			self.cursor.execute(cmd)
+			self.conn.commit()
 
 
 class UuidCache:
