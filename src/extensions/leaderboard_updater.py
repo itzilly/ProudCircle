@@ -67,6 +67,11 @@ class LeaderboardUpdater(commands.Cog):
 			logging.debug("Activating Lifetime Gexp Leaderboard Task")
 			self.lifetime_gexp_leaderboard_task.start()
 
+		self.lb_yearly_message = await self.lb_channel.fetch_message(int(self.lb_yearly_message_id))
+		if self.lb_yearly_message is not None:
+			logging.debug("Activating Yearly Gexp Leaderboard Task")
+			self.yearly_gexp_leaderboard_task.start()
+
 	@tasks.loop(hours=2)
 	async def division_leaderboard_task(self) -> None:
 		if not self.has_run_divisions:
@@ -179,20 +184,7 @@ class LeaderboardUpdater(commands.Cog):
 		position = 1
 		for line in results:
 			uuid, amount = line[0], line[1]
-			discord_link = self.local.discord_link.get_link(uuid)
-			if discord_link:
-				discord_member = self.bot.get_guild(self.server_id).get_member(int(discord_link.discord_id))
-				player_name = discord_member.mention if discord_member else None
-			else:
-				player_data = self.local.uuid_cache.get_player(uuid)
-				if player_data:
-					player_name = player_data.name
-				else:
-					player_name = util.mcign.MCIGN(util.mcign.dash_uuid(uuid=uuid)).name
-					timestamp = datetime.datetime.now().timestamp()
-					self.local.uuid_cache.add_player(uuid, player_name, timestamp)
-			if player_name:
-				player_name = player_name.replace('_', '\\_')
+			player_name = self.resolve_player_title(uuid)
 
 			if position == 1:
 				leaderboard_data.append(f":first_place:  {player_name}  -  {amount:,}")
@@ -220,6 +212,73 @@ class LeaderboardUpdater(commands.Cog):
 		await interaction.response.defer()
 		start_time = time.perf_counter()
 		await self.update_lifetime_gexp_leaderboard()
+		end_time = time.perf_counter()
+		response_embed = discord.Embed()
+		response_embed.colour = discord.Colour(0x08a169)
+		response_embed.description = f"Finished in f{end_time - start_time} seconds"
+		await interaction.edit_original_response(embed=response_embed)
+
+	@tasks.loop(hours=2)
+	async def yearly_gexp_leaderboard_task(self) -> None:
+		if not self.has_run_yearly:
+			self.has_run_yearly = True
+			logging.info("LeaderboardUpdater: Skipping first run (yearly)")
+			return
+		logging.info("LeaderboardUpdater: Running Yearly GEXP Task")
+		await self.update_yearly_gexp_leaderboard()
+
+	@yearly_gexp_leaderboard_task.before_loop
+	async def before_yearly_gexp_leaderboard_task(self) -> None:
+		await self.bot.wait_until_ready()
+
+	async def update_yearly_gexp_leaderboard(self):
+		logging.debug("Updating yearly gexp leaderboard")
+		# TODO: Only add players if they are currently in the guild
+
+		cursor = self.local.cursor
+		query = cursor.execute("""
+				select uuid, SUM(amount) as total_gexp
+				from expHistory
+				where timestamp >= strftime('%s', date('now', 'start of year'))
+				group by uuid
+				order by total_gexp desc
+			""")
+		results = query.fetchall()
+
+		leaderboard_embed = discord.Embed(timestamp=datetime.datetime.now())
+		leaderboard_data = []
+		position = 1
+		for line in results:
+			uuid, amount = line[0], line[1]
+			player_name = self.resolve_player_title(uuid)
+
+			if position == 1:
+				leaderboard_data.append(f":first_place:  {player_name}  -  {amount:,}")
+			elif position == 2:
+				leaderboard_data.append(f":second_place:  {player_name}  -  {amount:,}")
+			elif position == 3:
+				leaderboard_data.append(f":third_place:  {player_name}  -  {amount:,}")
+				leaderboard_data.append(" ========== ")
+			else:
+				if amount != 0:
+					leaderboard_data.append(f"#{position} {player_name} - {amount:,}")
+			position = position + 1
+
+		leaderboard_embed.title = "Yearly GEXP Leaderboard"
+		leaderboard_embed.description = "\n".join(leaderboard_data)
+		await self.lb_yearly_message.edit(embed=leaderboard_embed)
+
+	@app_commands.command(name="update-yearly-leaderboard",
+	                      description="Force-update the yearly gexp leaderboard (Admins Only")
+	async def update_yearly_gexp_leaderboard_command(self, interaction: discord.Interaction) -> None:
+		has_permission = await ensure_bot_permissions(interaction, send_deny_response=True)
+		if not has_permission:
+			return
+
+		logging.debug("Force-updating yearly gexp leaderboard...")
+		await interaction.response.defer()
+		start_time = time.perf_counter()
+		await self.update_yearly_gexp_leaderboard()
 		end_time = time.perf_counter()
 		response_embed = discord.Embed()
 		response_embed.colour = discord.Colour(0x08a169)
@@ -262,6 +321,7 @@ class LeaderboardUpdater(commands.Cog):
 		yearly_lb_message = await self.lb_channel.send(
 			embed=discord.Embed(title="This is the yearly gexp leaderboard"))
 		self.config.set_setting("lb_yearly_gexp_id", f"{yearly_lb_message.id}")
+		finished_yearly_gexp_leaderboard = await self.update_yearly_gexp_leaderboard()
 
 		monthly_lb_message = await self.lb_channel.send(
 			embed=discord.Embed(title="This is the monthly gexp leaderboard"))
@@ -278,6 +338,23 @@ class LeaderboardUpdater(commands.Cog):
 		finished_embed = discord.Embed()
 		finished_embed.description = "Created leaderboards!"
 		await interaction.followup.send(embed=finished_embed)
+
+	def resolve_player_title(self, uuid) -> str:
+		discord_link = self.local.discord_link.get_link(uuid)
+		if discord_link:
+			discord_member = self.bot.get_guild(self.server_id).get_member(int(discord_link.discord_id))
+			player_name = discord_member.mention if discord_member else None
+		else:
+			player_data = self.local.uuid_cache.get_player(uuid)
+			if player_data:
+				player_name = player_data.name
+			else:
+				player_name = util.mcign.MCIGN(util.mcign.dash_uuid(uuid=uuid)).name
+				timestamp = datetime.datetime.now().timestamp()
+				self.local.uuid_cache.add_player(uuid, player_name, timestamp)
+		if player_name:
+			player_name = player_name.replace('_', '\\_')
+		return player_name
 
 
 async def setup(bot: commands.Bot):
