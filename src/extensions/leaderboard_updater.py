@@ -72,6 +72,16 @@ class LeaderboardUpdater(commands.Cog):
 			logging.debug("Activating Yearly Gexp Leaderboard Task")
 			self.yearly_gexp_leaderboard_task.start()
 
+		self.lb_monthly_message = await self.lb_channel.fetch_message(int(self.lb_monthly_message_id))
+		if self.lb_monthly_message is not None:
+			logging.debug("Activating Monthly Gexp Leaderboard Task")
+			self.monthly_gexp_leaderboard_task.start()
+
+		self.lb_weekly_message = await self.lb_channel.fetch_message(int(self.lb_weekly_message_id))
+		if self.lb_weekly_message is not None:
+			logging.debug("Activating Weekly Gexp Leaderboard Task")
+			self.weekly_gexp_leaderboard_task.start()
+
 	@tasks.loop(hours=2)
 	async def division_leaderboard_task(self) -> None:
 		if not self.has_run_divisions:
@@ -268,6 +278,74 @@ class LeaderboardUpdater(commands.Cog):
 		leaderboard_embed.description = "\n".join(leaderboard_data)
 		await self.lb_yearly_message.edit(embed=leaderboard_embed)
 
+	@tasks.loop(hours=2)
+	async def monthly_gexp_leaderboard_task(self) -> None:
+		if not self.has_run_monthly:
+			self.has_run_monthly = True
+			logging.info("LeaderboardUpdater: Skipping first run (monthly)")
+			return
+		logging.info("LeaderboardUpdater: Running Monthly GEXP Task")
+		await self.update_monthly_gexp_leaderboard()
+
+	@monthly_gexp_leaderboard_task.before_loop
+	async def before_monthly_gexp_leaderboard_task(self) -> None:
+		await self.bot.wait_until_ready()
+
+	async def update_monthly_gexp_leaderboard(self):
+		logging.debug("Updating monthly gexp leaderboard")
+		# TODO: Only add players if they are currently in the guild
+
+		cursor = self.local.cursor
+		query = cursor.execute("""
+				select uuid, SUM(amount) as total_gexp
+				from expHistory
+				where strftime('%Y-%m', datetime(timestamp / 1000, 'unixepoch')) = strftime('%Y-%m', 'now')
+				group by uuid
+				order by total_gexp desc
+			""")
+		results = query.fetchall()
+
+
+		leaderboard_embed = discord.Embed(timestamp=datetime.datetime.now())
+		leaderboard_data = []
+		position = 1
+		for line in results:
+			uuid, amount = line[0], line[1]
+			player_name = self.resolve_player_title(uuid)
+
+			if position == 1:
+				leaderboard_data.append(f":first_place:  {player_name}  -  {amount:,}")
+			elif position == 2:
+				leaderboard_data.append(f":second_place:  {player_name}  -  {amount:,}")
+			elif position == 3:
+				leaderboard_data.append(f":third_place:  {player_name}  -  {amount:,}")
+				leaderboard_data.append(" ========== ")
+			else:
+				if amount != 0:
+					leaderboard_data.append(f"#{position} {player_name} - {amount:,}")
+			position = position + 1
+
+		leaderboard_embed.title = "Monthly GEXP Leaderboard"
+		leaderboard_embed.description = "\n".join(leaderboard_data)
+		await self.lb_monthly_message.edit(embed=leaderboard_embed)
+
+	@app_commands.command(name="update-monthly-leaderboard",
+	                      description="Force-update the monthly gexp leaderboard (Admins Only")
+	async def update_monthly_gexp_leaderboard_command(self, interaction: discord.Interaction) -> None:
+		has_permission = await ensure_bot_permissions(interaction, send_deny_response=True)
+		if not has_permission:
+			return
+
+		logging.debug("Force-updating monthly gexp leaderboard...")
+		await interaction.response.defer()
+		start_time = time.perf_counter()
+		await self.update_monthly_gexp_leaderboard()
+		end_time = time.perf_counter()
+		response_embed = discord.Embed()
+		response_embed.colour = discord.Colour(0x08a169)
+		response_embed.description = f"Finished in f{end_time - start_time} seconds"
+		await interaction.edit_original_response(embed=response_embed)
+
 	@app_commands.command(name="update-yearly-leaderboard",
 	                      description="Force-update the yearly gexp leaderboard (Admins Only")
 	async def update_yearly_gexp_leaderboard_command(self, interaction: discord.Interaction) -> None:
@@ -279,6 +357,73 @@ class LeaderboardUpdater(commands.Cog):
 		await interaction.response.defer()
 		start_time = time.perf_counter()
 		await self.update_yearly_gexp_leaderboard()
+		end_time = time.perf_counter()
+		response_embed = discord.Embed()
+		response_embed.colour = discord.Colour(0x08a169)
+		response_embed.description = f"Finished in f{end_time - start_time} seconds"
+		await interaction.edit_original_response(embed=response_embed)
+
+	@tasks.loop(hours=2)
+	async def weekly_gexp_leaderboard_task(self) -> None:
+		if not self.has_run_weekly:
+			self.has_run_weekly = True
+			logging.info("LeaderboardUpdater: Skipping first run (weekly)")
+			return
+		logging.info("LeaderboardUpdater: Running weekly GEXP Task")
+		await self.update_weekly_gexp_leaderboard()
+
+	@weekly_gexp_leaderboard_task.before_loop
+	async def before_weekly_gexp_leaderboard_task(self) -> None:
+		await self.bot.wait_until_ready()
+
+	async def update_weekly_gexp_leaderboard(self):
+		logging.debug("Updating weekly gexp leaderboard")
+		# TODO: Only add players if they are currently in the guild
+
+		cursor = self.local.cursor
+		query = cursor.execute("""
+					select uuid, SUM(amount) as total_gexp
+					from expHistory
+					where date(timestamp, 'unixepoch', 'weekday 1', '-6 day') = date('now', 'weekday 1', '-6 day')
+					group by uuid
+					order by total_gexp desc
+			""")
+		results = query.fetchall()
+
+		leaderboard_embed = discord.Embed(timestamp=datetime.datetime.now())
+		leaderboard_data = []
+		position = 1
+		for line in results:
+			uuid, amount = line[0], line[1]
+			player_name = self.resolve_player_title(uuid)
+
+			if position == 1:
+				leaderboard_data.append(f":first_place:  {player_name}  -  {amount:,}")
+			elif position == 2:
+				leaderboard_data.append(f":second_place:  {player_name}  -  {amount:,}")
+			elif position == 3:
+				leaderboard_data.append(f":third_place:  {player_name}  -  {amount:,}")
+				leaderboard_data.append(" ========== ")
+			else:
+				if amount != 0:
+					leaderboard_data.append(f"#{position} {player_name} - {amount:,}")
+			position = position + 1
+
+		leaderboard_embed.title = "Weekly GEXP Leaderboard"
+		leaderboard_embed.description = "\n".join(leaderboard_data)
+		await self.lb_weekly_message.edit(embed=leaderboard_embed)
+
+	@app_commands.command(name="update-weekly-leaderboard",
+	                      description="Force-update the weekly gexp leaderboard (Admins Only")
+	async def update_weekly_gexp_leaderboard_command(self, interaction: discord.Interaction) -> None:
+		has_permission = await ensure_bot_permissions(interaction, send_deny_response=True)
+		if not has_permission:
+			return
+
+		logging.debug("Force-updating weekly gexp leaderboard...")
+		await interaction.response.defer()
+		start_time = time.perf_counter()
+		await self.update_weekly_gexp_leaderboard()
 		end_time = time.perf_counter()
 		response_embed = discord.Embed()
 		response_embed.colour = discord.Colour(0x08a169)
@@ -308,32 +453,52 @@ class LeaderboardUpdater(commands.Cog):
 
 		await self.lb_channel.send("Re-Generating the leaderboard messages...")
 
-		division_lb_message = await self.lb_channel.send(
-			embed=discord.Embed(title="This is the division leaderboard"))
-		self.config.set_setting("lb_division_id", f"{division_lb_message.id}")
-		finished_division_leaderboard = await self.update_division_leaderboard()
+		try:
+			self.lb_division_message = await self.lb_channel.send(
+				embed=discord.Embed(title="This is the division leaderboard"))
+			self.config.set_setting("lb_division_id", f"{self.lb_division_message.id}")
+			finished_division_leaderboard = await self.update_division_leaderboard()
+		except Exception as e:
+			logging.critical(f"Error generating division leaderboard: {e}")
 
-		lifetime_lb_message = await self.lb_channel.send(
-			embed=discord.Embed(title="This is the lifetime gexp leaderboard"))
-		self.config.set_setting("lb_lifetime_gexp_id", f"{lifetime_lb_message.id}")
-		finished_lifetime_gexp_leaderboard = await self.update_lifetime_gexp_leaderboard()
+		try:
+			self.lb_lifetime_message = await self.lb_channel.send(
+				embed=discord.Embed(title="This is the lifetime gexp leaderboard"))
+			self.config.set_setting("lb_lifetime_gexp_id", f"{self.lb_lifetime_message.id}")
+			finished_lifetime_gexp_leaderboard = await self.update_lifetime_gexp_leaderboard()
+		except Exception as e:
+			logging.critical(f"Error generating lifetime leaderboard: {e}")
 
-		yearly_lb_message = await self.lb_channel.send(
-			embed=discord.Embed(title="This is the yearly gexp leaderboard"))
-		self.config.set_setting("lb_yearly_gexp_id", f"{yearly_lb_message.id}")
-		finished_yearly_gexp_leaderboard = await self.update_yearly_gexp_leaderboard()
+		try:
+			self.lb_yearly_message = await self.lb_channel.send(
+				embed=discord.Embed(title="This is the yearly gexp leaderboard"))
+			self.config.set_setting("lb_yearly_gexp_id", f"{self.lb_yearly_message.id}")
+			finished_yearly_gexp_leaderboard = await self.update_yearly_gexp_leaderboard()
+		except Exception as e:
+			logging.critical(f"Error generating yearly leaderboard: {e}")
 
-		monthly_lb_message = await self.lb_channel.send(
-			embed=discord.Embed(title="This is the monthly gexp leaderboard"))
-		self.config.set_setting("lb_monthly_gexp_id", f"{monthly_lb_message.id}")
+		try:
+			self.lb_monthly_message = await self.lb_channel.send(
+				embed=discord.Embed(title="This is the monthly gexp leaderboard"))
+			self.config.set_setting("lb_monthly_gexp_id", f"{self.lb_monthly_message.id}")
+			finished_monthly_gexp_leaderboard = await self.update_monthly_gexp_leaderboard()
+		except Exception as e:
+			logging.critical(f"Error generating monthly leaderboard: {e}")
 
-		weekly_lb_message = await self.lb_channel.send(
-			embed=discord.Embed(title="This is the weekly gexp leaderboard"))
-		self.config.set_setting("lb_weekly_gexp_id", f"{weekly_lb_message.id}")
+		try:
+			self.lb_weekly_message = await self.lb_channel.send(
+				embed=discord.Embed(title="This is the weekly gexp leaderboard"))
+			self.config.set_setting("lb_weekly_gexp_id", f"{self.lb_weekly_message.id}")
+			finished_weekly_gexp_leaderboard = await self.update_weekly_gexp_leaderboard()
+		except Exception as e:
+			logging.critical(f"Error generating weekly leaderboard: {e}")
 
-		daily_lb_message = await self.lb_channel.send(
-			embed=discord.Embed(title="This is the daily gexp leaderboard"))
-		self.config.set_setting("lb_daily_gexp_id", f"{daily_lb_message.id}")
+		try:
+			self.lb_daily_message = await self.lb_channel.send(
+				embed=discord.Embed(title="This is the daily gexp leaderboard"))
+			self.config.set_setting("lb_daily_gexp_id", f"{self.lb_daily_message.id}")
+		except Exception as e:
+			logging.critical(f"Error generating daily leaderboard: {e}")
 
 		finished_embed = discord.Embed()
 		finished_embed.description = "Created leaderboards!"
