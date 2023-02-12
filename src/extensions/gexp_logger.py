@@ -14,7 +14,11 @@ class GexpLogger(commands.Cog):
 		super().__init__(*args, **kwargs)
 		self.bot = bot
 		self.local_data = local.LOCAL_DATA
-		self.has_run = False
+		self.server_id = int(local.LOCAL_DATA.config.get_setting("server_id"))
+		self.has_run = True
+		self.start_message = None
+		self.start_time = None
+		self.log_channel = int(local.LOCAL_DATA.config.get_setting("log_channel"))
 		self.log_gexp.start()
 
 	def check_table_structure(self) -> None:
@@ -99,22 +103,14 @@ class GexpLogger(commands.Cog):
 			self.has_run = True
 			logging.debug("GexpLogger: Skipping first run")
 			return
-
 		start_time = time.perf_counter()
 		task_id = uuid.uuid4()
-		logging.info(f"Running GexpLogger (id: {task_id})")
-		start_message = await self.bot.get_guild(1031393503902715985).get_channel(1061815307473268827)\
-			.send(
-			embed=embed_lib.GexpLoggerStartEmbed(
-				task_id=task_id,
-				start_time=start_time
-			))
+		await self.send_starting_message(start_time, task_id)
 		data = await self.fetch_guild_data()
 		members_synced = 0
 
 		bot_server_id = int(local.LOCAL_DATA.config.get_setting("server_id"))
 		bot_admin = int(local.LOCAL_DATA.config.get_setting("bot_admin_role_id"))
-		log_channel = int(local.LOCAL_DATA.config.get_setting("log_channel"))
 		if data is None:
 			logging.critical("Unknown error fetching guild data")
 			await self.bot.get_guild(bot_server_id).get_channel(bot_admin).send(
@@ -127,14 +123,7 @@ class GexpLogger(commands.Cog):
 				self.sync_division(member)
 				members_synced += 1
 		end_time = time.perf_counter()
-		await start_message.delete()
-		await self.bot.get_guild(bot_server_id).get_channel(log_channel).send(
-			embed=embed_lib.GexpLoggerFinishEmbed(
-				task_id=task_id,
-				start_time=start_time,
-				end_time=end_time,
-				members_synced=members_synced
-			))
+		await self.send_finish_message(task_id, start_time, end_time, members_synced)
 		logging.debug(f"GexpLogger Complete (id: {task_id})")
 
 	@log_gexp.before_loop
@@ -142,6 +131,30 @@ class GexpLogger(commands.Cog):
 		await self.bot.wait_until_ready()
 		self.check_table_structure()
 
+	async def send_starting_message(self, start_time, task_id):
+		logging.info(f"Running GexpLogger (id: {task_id})")
+		try:
+			self.start_message = await self.bot.get_guild(self.server_id).get_channel(1061815307473268827)\
+				.send(
+				embed=embed_lib.GexpLoggerStartEmbed(
+					task_id=task_id,
+					start_time=start_time
+				))
+		except Exception as e:
+			logging.warning(e)
+
+	async def send_finish_message(self, task_id, start_time, end_time, members_synced):
+		try:
+			await self.start_message.delete()
+			await self.bot.get_guild(self.server_id).get_channel(self.log_channel).send(
+				embed=embed_lib.GexpLoggerFinishEmbed(
+					task_id=task_id,
+					start_time=start_time,
+					end_time=end_time,
+					members_synced=members_synced
+				))
+		except Exception as e:
+			logging.warning(e)
 
 async def setup(bot: commands.Bot):
 	logging.debug("Adding cog: GexpLogger")
