@@ -1,0 +1,10 @@
+*.db
+*.log
+*.gz
+
+**/__pycache__/
+
+/.idea
+/env
+
+!.idea/runConfigurations

@@ -514,6 +514,9 @@ class LeaderboardUpdater(commands.Cog):
 				player_name = player_data.name
 			else:
 				player_name = await self.request_player_name(util.mcign.dash_uuid(uuid=uuid))
+				logging.info(f"uuid: {uuid} | type: {type(player_name)} | name: {player_name}")
+				if player_name is None:
+					player_name = await self.request_player_name(util.mcign.dash_uuid(uuid=uuid))
 				timestamp = datetime.datetime.now().timestamp()
 				self.local.uuid_cache.add_player(uuid, player_name, timestamp)
 		if player_name:
