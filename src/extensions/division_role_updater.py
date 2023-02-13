@@ -2,10 +2,11 @@ import json
 import discord
 import logging
 
-from util import local, embed_lib, log_link
+from datetime import datetime
 from discord import app_commands
 from discord.ext import commands
 
+from util import local, embed_lib, log_link
 from util.local import XP_DIVISION_DATA_PATH
 
 
@@ -103,34 +104,25 @@ class DivisionRoleUpdater(commands.Cog):
 
 		logging.info("Completed updating divisions!")
 
-		embed_data = {
-			"title": "Run Completion:",
-			"description": "Updated Divisions",
-			"color": rgb_to_decimal(77, 24, 214),
-			"fields": [
-				{
-					"name": "Members Updated:",
-					"value": f"{self.members_updated}"
-				},
-				{
-					"name": "Handled Errors:",
-					"value": f"{self.errors}"
-				}
-			]
-		}
-
-		log_link.task_webhook(embed_data)
-
 	@app_commands.command(name="update-divisions", description="Run the divisions update task")
 	async def update_divisions_command(self, interaction: discord.Interaction):
 		is_bot_admin = self.check_permission(interaction.user)
 		if not is_bot_admin:
 			await interaction.response.send_message(embed=embed_lib.InsufficientPermissionsEmbed())
 			return
-
-		working_embed = discord.Embed(description="Running divisions task", colour=discord.Colour(0x1bb9cc))
-		await interaction.response.send_message(embed=working_embed)
+		
+		await interaction.response.defer()
 		await self.run(interaction)
+
+		finished_embed = discord.Embed(
+			timestamp=datetime.now(),
+			title="Run Completion",
+			description="Updated Divisions",
+			colour=discord.Colour(0x4d18d6),
+		)
+		finished_embed.add_field(name="Members Updated:", value=f"{self.members_updated}")
+		finished_embed.add_field(name="Handled Errors:", value=f"{self.errors}")
+		await interaction.edit_original_response(embed=finished_embed)
 
 	# Permissions Check
 	def check_permission(self, user: discord.Interaction.user):
