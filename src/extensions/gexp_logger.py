@@ -15,7 +15,7 @@ class GexpLogger(commands.Cog):
 		self.bot = bot
 		self.local_data = local.LOCAL_DATA
 		self.server_id = int(local.LOCAL_DATA.config.get_setting("server_id"))
-		self.has_run = True
+		self.has_run = False
 		self.start_message = None
 		self.start_time = None
 		self.log_channel = int(local.LOCAL_DATA.config.get_setting("log_channel"))
