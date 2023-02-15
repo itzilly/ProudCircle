@@ -79,9 +79,65 @@ class ForceLinkCommand(commands.Cog):
 # 		pass
 
 
+class ForceUnlinkCommand(commands.Cog):
+	def __init__(self, bot: commands.Bot):
+		self.bot = bot
+		self.config: local.ConfigHandler = local.LOCAL_DATA.config
+		self.cursor = self.config.cursor
+
+	def check_permission(self, user: discord.Interaction.user):
+		request = local.LOCAL_DATA.cursor.execute("SELECT bot_admin_role_id FROM config").fetchone()[0]
+		if request is None:
+			return False
+		if user.get_role(int(request)):
+			return True
+		return False
+
+	@app_commands.command(name="forceunlink", description="Forceunlink a discord user and ign/uuid")
+	@app_commands.describe(id="Discord ID or UUID of a player to remove")
+	async def force_unlink(self, interaction: discord.Interaction, id: str):
+		is_bot_admin = self.check_permission(interaction.user)
+		if not is_bot_admin:
+			await interaction.response.send_message(embed=embed_lib.InsufficientPermissionsEmbed())
+			return
+
+		cmd = "SELECT id, uuid, discordId, discordUsername, linkedAt FROM discordLink WHERE (uuid is ?) or (discordId is ?)"
+		query = self.cursor.execute(cmd, (mcign.cleanup_uuid(id), id)).fetchall()
+		if len(query) > 1:
+			logging.error("Duplicate links found, this should not happen!")
+			await interaction.response.send_message("Duplicate links found, this should not happen!")
+			cmd = "DELETE FROM discordLink WHERE (uuid = ?) or (discordId = ?)"
+			query = self.cursor.execute(cmd, (id, id))
+			return
+		elif len(query) == 0:
+			logging.warning("No link found")
+			return
+
+		result = query[0]
+		row_id = result[0]
+		uuid = result[1]
+		discord_id = result[2]
+		discord_username = result[3]
+		linked_at = result[4]
+
+		logging.debug(f"Row ID: {row_id}")
+		logging.debug(f"UUID: {uuid}")
+		logging.debug(f"Discord ID: {discord_id}")
+		logging.debug(f"Discord Username: {discord_username}")
+		logging.debug(f"Linked At: {linked_at}")
+
+		cmd = "DELETE FROM discordLink WHERE id = ?"
+		query = self.cursor.execute(cmd, (row_id,))
+		self.cursor.connection.commit()
+		await interaction.response.send_message("Removed from links!")
+
+
 # Add link and unlink commands to bot
 async def setup(bot: commands.Bot):
 	logging.debug("Adding cog: ForceLinkCommand")
 	await bot.add_cog(ForceLinkCommand(bot))
 	# logging.debug("Adding Cog: UnlinkCommand")
 	# await bot.add_cog(UnlinkCommand(bot))
+
+	logging.debug("Adding cog: ForceUnlinkCommand")
+	await bot.add_cog(ForceUnlinkCommand(bot))
