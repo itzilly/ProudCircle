@@ -371,11 +371,11 @@ class LeaderboardUpdater(commands.Cog):
 	async def update_daily_gexp_leaderboard(self) -> None:
 		logging.debug("Updating daily gexp leaderboard")
 		cmd = """
-			select uuid, SUM(amount) as total_gexp
-			from expHistory
-			where timestamp >= strftime('%s', date('now')) * 1000 and timestamp < strftime('%s', date('now', '+1 day')) * 1000
-			group by uuid
-			order by total_gexp desc;
+			SELECT uuid, SUM(amount) AS total_gexp
+			FROM expHistory
+			WHERE date = DATE('now')
+			GROUP BY uuid
+			ORDER BY total_gexp DESC;
 		"""
 		leaderboard_embed = discord.Embed(
 			timestamp=datetime.datetime.now(),
