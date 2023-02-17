@@ -2,6 +2,7 @@ import json
 import time
 import uuid
 
+import aiohttp
 import discord
 import logging
 
@@ -9,6 +10,7 @@ from datetime import datetime
 from discord import app_commands
 from discord.ext import commands, tasks
 
+import util.local
 from util import local, embed_lib, log_link
 from util.local import XP_DIVISION_DATA_PATH
 
@@ -21,6 +23,7 @@ class DivisionRoleUpdater(commands.Cog):
 	def __init__(self, bot: commands.Bot, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
+		self.local_data: util.local.LocalData = util.local.LOCAL_DATA
 		self.bot = bot
 
 		# self.role_data = local.LOCAL_DATA.xp_division_data
@@ -36,8 +39,28 @@ class DivisionRoleUpdater(commands.Cog):
 		self.has_run = False
 		self.is_running = False
 
+		self.cosmetic_role_id = 1055844799015563274
+
 	def get_member_xp(self, member):
 		cmd = "SELECT uuid, amount FROM expHistory ORDER BY date DESC"
+
+	async def strip_member_of_divisions(self, member):
+		uuid = member[0]
+		discord_link = self.local_data.discord_link.get_link(uuid)
+		if discord_link is None:
+			self.errors = self.errors + 1
+			return
+
+		discord_member = await self.bot.get_guild(self.server_id).get_member(discord_link.discord_id)
+		for role in self.roles_data:
+			role_id = role["role_id"]
+			for member_role in discord_member.roles:
+				if member_role.id == role_id:
+					logging.debug(f"Removing {member_role.name} from {discord_link.discord_username}")
+					# await discord_member.remove_roles([discord.Object(role_id)])
+
+		logging.debug(f"Removing cosmetic role from {discord_link.discord_username}")
+		await discord_member.remove_roles([discord.Object(self.cosmetic_role_id)])
 
 	async def update_member_division(self, member):
 		uuid = member[0]
@@ -60,10 +83,9 @@ class DivisionRoleUpdater(commands.Cog):
 			return
 
 		# Add the <-- GEXP --> Cosmetic role (cosmetic role id: 1055844799015563274)
-		cosmetic_role_id = 1055844799015563274
-		if self.bot.get_guild(self.server_id).get_role(cosmetic_role_id) not in discord_member.roles:
+		if self.bot.get_guild(self.server_id).get_role(self.cosmetic_role_id) not in discord_member.roles:
 			logging.debug(f"Adding cosmetic role to {discord_member.name}")
-			await discord_member.add_roles(self.bot.get_guild(self.server_id).get_role(cosmetic_role_id))
+			await discord_member.add_roles(self.bot.get_guild(self.server_id).get_role(self.cosmetic_role_id))
 
 		# Find the highest role the member qualifies for
 		highest_role = None
@@ -97,20 +119,29 @@ class DivisionRoleUpdater(commands.Cog):
 		self.members_updated = 0
 		self.errors = 0
 
-		with open(XP_DIVISION_DATA_PATH, encoding='utf-8') as json_file:
-			roles_data = json.load(json_file)
-
 		cmd = "SELECT DISTINCT uuid FROM expHistory"
 		table_members = self.cursor.execute(cmd).fetchall()
 
-		for role in roles_data["roles"]:
+		for role in self.roles_data["roles"]:
 			self.all_division_role_ids.append(role["role_id"])
 
+		guild_members = await self.fetch_guild_members_list()
+
 		for member in table_members:
+			member_uuid = member[0]
+			if member_uuid not in guild_members:
+				try:
+					await self.strip_member_of_divisions(member)
+				except Exception as e:
+					self.errors = self.errors + 1
+					logging.critical(e)
+				continue
+
 			try:
 				await self.update_member_division(member)
 			except Exception as e:
 				logging.critical(e)
+				self.errors = self.errors + 1
 
 		self.is_running = False
 		logging.info("Completed updating divisions!")
@@ -142,6 +173,26 @@ class DivisionRoleUpdater(commands.Cog):
 			logging.debug("DivisionRoleUpdater: Skipping first run")
 			return
 
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+		print()
+
 		await self.run()
 
 		finished_embed = discord.Embed(
@@ -154,7 +205,7 @@ class DivisionRoleUpdater(commands.Cog):
 		finished_embed.add_field(name="Handled Errors:", value=f"{self.errors}")
 		bot_log_channel_id = 1061815307473268827
 		await self.bot.get_guild(self.server_id).get_channel(bot_log_channel_id).send_message(finished_embed)
-		
+
 	@update_divisions_task.before_loop
 	async def before_update_divisions_task(self):
 		await self.bot.wait_until_ready()
@@ -168,6 +219,22 @@ class DivisionRoleUpdater(commands.Cog):
 		if user.get_role(int(request)):
 			return True
 		return False
+
+	async def fetch_guild_members_list(self):
+		key = self.local_data.config.get_setting("api_key")
+		guild_id = self.local_data.config.get_setting("guild_id")
+		url = f"https://api.hypixel.net/guild?key={key}&id={guild_id}"
+		members_list = []
+		async with aiohttp.ClientSession() as session:
+			async with session.get(url) as response:
+				# ratelimit_remaining = response.headers["RateLimit-Remaining"]
+				guild_data = await response.json()
+				if not guild_data["success"]:
+					logging.fatal(f"Unsuccessful in scraping api data: {response.headers} | {guild_data}")
+					return None
+				for member in guild_data.get("members", []):
+					members_list.append(member.get("uuid", ""))
+				return members_list
 
 
 async def setup(bot: commands.Bot):
