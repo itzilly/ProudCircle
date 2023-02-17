@@ -1,10 +1,13 @@
 import json
+import time
+import uuid
+
 import discord
 import logging
 
 from datetime import datetime
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from util import local, embed_lib, log_link
 from util.local import XP_DIVISION_DATA_PATH
@@ -30,6 +33,8 @@ class DivisionRoleUpdater(commands.Cog):
 
 		self.members_updated = 0
 		self.errors = 0
+		self.has_run = False
+		self.is_running = False
 
 	def get_member_xp(self, member):
 		cmd = "SELECT uuid, amount FROM expHistory ORDER BY date DESC"
@@ -83,7 +88,12 @@ class DivisionRoleUpdater(commands.Cog):
 					logging.debug(f"Removing role_id: {role.id} | {discord_link.discord_id}")
 					await discord_member.remove_roles(remove_role)
 
-	async def run(self, interaction):
+	async def run(self):
+		if self.is_running:
+			logging.warning("DivisionRoleUpdater: Attempted to run while already running")
+			return
+
+		self.is_running = True
 		self.members_updated = 0
 		self.errors = 0
 
@@ -102,6 +112,7 @@ class DivisionRoleUpdater(commands.Cog):
 			except Exception as e:
 				logging.critical(e)
 
+		self.is_running = False
 		logging.info("Completed updating divisions!")
 
 	@app_commands.command(name="update-divisions", description="Run the divisions update task")
@@ -112,7 +123,7 @@ class DivisionRoleUpdater(commands.Cog):
 			return
 		
 		await interaction.response.defer()
-		await self.run(interaction)
+		await self.run()
 
 		finished_embed = discord.Embed(
 			timestamp=datetime.now(),
@@ -123,6 +134,31 @@ class DivisionRoleUpdater(commands.Cog):
 		finished_embed.add_field(name="Members Updated:", value=f"{self.members_updated}")
 		finished_embed.add_field(name="Handled Errors:", value=f"{self.errors}")
 		await interaction.edit_original_response(embed=finished_embed)
+
+	@tasks.loop(hours=2)
+	async def update_divisions_task(self):
+		if not self.has_run:
+			self.has_run = True
+			logging.debug("DivisionRoleUpdater: Skipping first run")
+			return
+
+		await self.run()
+
+		finished_embed = discord.Embed(
+			timestamp=datetime.now(),
+			title="Run Completion",
+			description="Updated Divisions",
+			colour=discord.Colour(0x4d18d6),
+		)
+		finished_embed.add_field(name="Members Updated:", value=f"{self.members_updated}")
+		finished_embed.add_field(name="Handled Errors:", value=f"{self.errors}")
+		bot_log_channel_id = 1061815307473268827
+		await self.bot.get_guild(self.server_id).get_channel(bot_log_channel_id).send_message(finished_embed)
+		
+	@update_divisions_task.before_loop
+	async def before_update_divisions_task(self):
+		await self.bot.wait_until_ready()
+
 
 	# Permissions Check
 	def check_permission(self, user: discord.Interaction.user):
