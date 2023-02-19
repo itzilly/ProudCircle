@@ -66,11 +66,11 @@ class GexpLoggerFinishEmbed(discord.Embed):
 
 
 class PlayerGexpDataNotFoundEmbed(discord.Embed):
-	def __init__(self, player=None):
+	def __init__(self, player: str = None):
 		super().__init__()
 		self.colour = discord.Colour(0x66112e)
 		self.description = "Guild player data not found"
-		if player is None:
+		if player is not None:
 			self.description = self.description + " for `" + player + "`!"
 		else:
 			self.description = self.description + "!"
@@ -79,7 +79,7 @@ class PlayerGexpDataNotFoundEmbed(discord.Embed):
 class DailyGexpEmbed(discord.Embed):
 	def __init__(self, player_name: str, player_uuid: str, gexp: int, date: str):
 		super().__init__()
-		self.player_name = player_name
+		self.player_name = player_name.replace("_", "\\_")
 		self.player_uuid = player_uuid
 		self.gexp = gexp
 		self.colour = discord.Colour(0xe80560)
@@ -91,8 +91,9 @@ class DailyGexpEmbed(discord.Embed):
 class WeeklyGexpEmbed(discord.Embed):
 	def __init__(self, player_name: str, player_uuid: str, gexp: dict, todays_date: datetime.datetime):
 		super().__init__()
+		player_name = player_name.replace("_", "\\_")
 		self.colour = discord.Colour(0xe80560)
-		self.title = f"{player_name}'s Weekly Gexp for {(todays_date-datetime.timedelta(days=7)).strftime('%B %d, %Y')}"
+		self.title = f"{player_name}'s Weekly Gexp for {(todays_date - datetime.timedelta(days=7)).strftime('%B %d, %Y')}"
 		gexp_history = []
 		weekly_gexp = 0
 		for day_gexp_date, day_gexp_amount in gexp.items():
@@ -108,6 +109,7 @@ class WeeklyGexpEmbed(discord.Embed):
 class MonthlyGexpEmbed(discord.Embed):
 	def __init__(self, player_name: str, player_uuid: str, gexp: dict, todays_date: datetime.datetime):
 		super().__init__()
+		player_name = player_name.replace("_", "\\_")
 		self.colour = discord.Colour(0xe80560)
 		month_name = todays_date.strftime('%B')
 		self.title = f"{player_name}'s Monthly Gexp for {month_name}"
@@ -126,12 +128,12 @@ class MonthlyGexpEmbed(discord.Embed):
 class YearlyGexpEmbed(discord.Embed):
 	def __init__(self, player_name: str, player_uuid: str, player_head, gexp: int):
 		super().__init__()
-		self.player_name = player_name
-		self.player_uuid = player_uuid
-		self.player_head = player_head
-		self.gexp = gexp
+		player_name = player_name.replace("_", "\\_")
+		player_uuid = player_uuid
+		player_head = player_head
+		gexp = gexp
 		self.colour = discord.Colour(0xe80560)
-		self.title = self.player_name + "'s GEXP 2023"
+		self.title = player_name + "'s GEXP 2023"
 		self.set_thumbnail(url=f"https://mc-heads.net/avatar/{player_uuid}/64")
 		self.description = f"**{player_name}** has earned a grand total of {gexp:,} gexp this year!"
 
@@ -140,6 +142,7 @@ class SuccessfullyLinkedEmbed(discord.Embed):
 	def __init__(self, username, member: discord.Member):
 		super().__init__()
 		self.colour = discord.Colour(0x0c70f2)
+		username = username.replace("_", "\\_")
 		self.description = f"Successfully linked {username} to {member.mention}"
 
 
@@ -147,6 +150,7 @@ class SuccessfullyForceLinkedEmbed(discord.Embed):
 	def __init__(self, username, member: discord.Member):
 		super().__init__()
 		self.colour = discord.Colour(0x0c70f2)
+		username = username.replace("_", "\\_")
 		self.description = f"Successfully linked {username} to `{member.name}#{member.discriminator}`"
 
 
