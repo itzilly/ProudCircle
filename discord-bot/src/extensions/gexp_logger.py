@@ -2,7 +2,10 @@ import uuid
 import time
 import logging
 import aiohttp
+import discord
+from discord import app_commands
 
+import util.command_helper
 from util import local
 from util import embed_lib
 from datetime import datetime
@@ -20,6 +23,7 @@ class GexpLogger(commands.Cog):
 		self.start_time = None
 		self.log_channel = int(local.LOCAL_DATA.config.get_setting("log_channel"))
 		self.log_gexp.start()
+		self.is_running = False
 
 	def check_table_structure(self) -> None:
 		logging.debug("Checking expHistory table structure")
@@ -99,13 +103,39 @@ class GexpLogger(commands.Cog):
 
 	@tasks.loop(minutes=15)
 	async def log_gexp(self) -> None:
+		if self.is_running:
+			return
+
 		if not self.has_run:
 			self.has_run = True
 			logging.debug("GexpLogger: Skipping first run")
 			return
+
+		self.is_running = True
+		try:
+			await self.run_sync()
+		except Exception as e:
+			logging.critical(f"GexpLogger: Could not complete task -> {e}")
+		self.is_running = False
+
+	@log_gexp.before_loop
+	async def before_exp_logger_init(self):
+		await self.bot.wait_until_ready()
+		self.check_table_structure()
+
+	async def run_sync(self, interaction: discord.Interaction = None):
 		start_time = time.perf_counter()
 		task_id = uuid.uuid4()
 		await self.send_starting_message(start_time, task_id)
+		if interaction is not None:
+			try:
+				await interaction.response.send_message(embed=embed_lib.GexpLoggerStartEmbed(
+					task_id=task_id,
+					start_time=start_time
+				))
+			except Exception as e:
+				logging.error(f"GexpLogger: Could not send start message to log channel -> {e}")
+
 		data = await self.fetch_guild_data()
 		members_synced = 0
 
@@ -124,12 +154,17 @@ class GexpLogger(commands.Cog):
 				members_synced += 1
 		end_time = time.perf_counter()
 		await self.send_finish_message(task_id, start_time, end_time, members_synced)
+		if interaction is not None:
+			try:
+				await interaction.edit_original_response(embed=embed_lib.GexpLoggerFinishEmbed(
+					task_id=task_id,
+					start_time=start_time,
+					end_time=end_time,
+					members_synced=members_synced
+				))
+			except Exception as e:
+				logging.error(f"GexpLogger: Could not send finish message to log channel -> {e}")
 		logging.debug(f"GexpLogger Complete (id: {task_id})")
-
-	@log_gexp.before_loop
-	async def before_exp_logger_init(self):
-		await self.bot.wait_until_ready()
-		self.check_table_structure()
 
 	async def send_starting_message(self, start_time, task_id):
 		logging.info(f"Running GexpLogger (id: {task_id})")
@@ -155,6 +190,32 @@ class GexpLogger(commands.Cog):
 				))
 		except Exception as e:
 			logging.warning(e)
+
+	@app_commands.command(name="sync-gexp", description="Sync's the gexp with hypixel's data (Admins Only")
+	async def sync_gexp_command(self, interaction: discord.Interaction):
+		is_bot_admin = util.command_helper.ensure_bot_permissions(interaction, send_deny_response=True)
+		if not is_bot_admin:
+			return
+
+		if self.is_running:
+			is_running_embed = discord.Embed(description="Syncing is already happening, please wait before running this command again")
+			await interaction.response.send_message(embed=is_running_embed)
+			return
+
+		self.is_running = True
+		try:
+			await self.run_sync(interaction)
+		except Exception as e:
+			logging.critical(f"GexpLogger: Could not complete command task -> {e}")
+		self.is_running = False
+
+	def check_permission(self, user: discord.Interaction.user):
+		request = local.LOCAL_DATA.cursor.execute("SELECT bot_admin_role_id FROM config").fetchone()[0]
+		if request is None:
+			return False
+		if user.get_role(int(request)):
+			return True
+		return False
 
 async def setup(bot: commands.Bot):
 	logging.debug("Adding cog: GexpLogger")
