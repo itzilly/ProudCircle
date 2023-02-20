@@ -5,40 +5,51 @@
     <title>Results</title>
   </head>
   <body>
-    <h1>Results</h1>
-    {% if results %}
-      <table>
-        <tr>
-          <th id="date-header">Date</th>
-          <th id="amount-header">Amount</th>
-          <th>Rank</th>
-        </tr>
-        {% for row in results %}
-          <tr>
-            <td>{{ row[1] }}</td>
-            <td>{{ row[3]|intcomma }}</td>
-            <td>
-              {% if row[4] == "Guild Master" %}
-                <span class="guild-master">{{ row[4] }}</span>
-              {% elif row[4] == "Guild Staff" %}
-                <span class="guild-staff">{{ row[4] }}</span>
-              {% elif row[4] == "Member" %}
-                <span class="rank-member">{{ row[4] }}</span>
-              {% elif row[4] == "Celestial" %}
-                <span class="rank-celestial">{{ row[4] }}</span>
-              {% elif row[4] == "Legend" %}
-                <span class="rank-legend">{{ row[4] }}</span>
-              {% elif row[4] == "Champion" %}
-                <span class="rank-champion">{{ row[4] }}</span>
-              {% else %}
-                {{ row[4] }}
-              {% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </table>
-    {% else %}
-      <p>No results found.</p>
-    {% endif %}
+    <div class="container">
+      <h1>Results for {{ data["playername"] }}</h1>
+      <button id="sort-date-asc">Sort by Date (asc)</button>
+      <button id="sort-date-desc">Sort by Date (desc)</button>
+      <button id="sort-amount-asc">Sort by Amount (asc)</button>
+      <button id="sort-amount-desc">Sort by Amount (desc)</button>
+      {% if data %}
+        <table id="results-table">
+          <thead>
+            <tr>
+              <th id="date-header">Date</th>
+              <th id="amount-header">Amount</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data["expHistory"] %}
+              <tr>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[3]|intcomma }}</td>
+                <td>
+                  {% if row[4] == "Guild Master" %}
+                    <span class="guild-master">{{ row[4] }}</span>
+                  {% elif row[4] == "Guild Staff" %}
+                    <span class="guild-staff">{{ row[4] }}</span>
+                  {% elif row[4] == "Member" %}
+                    <span class="rank-member">{{ row[4] }}</span>
+                  {% elif row[4] == "Celestial" %}
+                    <span class="rank-celestial">{{ row[4] }}</span>
+                  {% elif row[4] == "Legend" %}
+                    <span class="rank-legend">{{ row[4] }}</span>
+                  {% elif row[4] == "Champion" %}
+                    <span class="rank-champion">{{ row[4] }}</span>
+                  {% else %}
+                    {{ row[4] }}
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No results found.</p>
+      {% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='scripts/results.js') }}"></script>
   </body>
 </html>
