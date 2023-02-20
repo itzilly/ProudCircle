@@ -13,7 +13,7 @@ app.jinja_env.filters['intcomma'] = humanize.intcomma
 
 
 def connect_db():
-    conn = sqlite3.connect(r"O:\Python Programming\ProudCircle\discord-bot\src\data\proudcircle.db")
+    conn = sqlite3.connect("../../discord-bot/src/data/proudcircle.db")
     return conn
 
 
