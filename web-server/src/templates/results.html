@@ -7,10 +7,10 @@
   <body>
     <div class="container">
       <h1>Results for {{ data["playername"] }}</h1>
-      <button id="sort-date-asc">Sort by Date (asc)</button>
-      <button id="sort-date-desc">Sort by Date (desc)</button>
-      <button id="sort-amount-asc">Sort by Amount (asc)</button>
-      <button id="sort-amount-desc">Sort by Amount (desc)</button>
+      <button class="sort-button" id="sort-date-asc">Sort by Date (asc)</button>
+      <button class="sort-button" id="sort-date-desc">Sort by Date (desc)</button>
+      <button class="sort-button" id="sort-amount-asc">Sort by Amount (asc)</button>
+      <button class="sort-button" id="sort-amount-desc">Sort by Amount (desc)</button>
       {% if data %}
         <table id="results-table">
           <thead>
@@ -50,6 +50,6 @@
         <p>No results found.</p>
       {% endif %}
     </div>
-    <script src="{{ url_for('static', filename='scripts/results.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='scripts/results.js') }}"></script>
   </body>
 </html>
