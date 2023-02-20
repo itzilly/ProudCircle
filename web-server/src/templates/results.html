@@ -1,29 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/results.css') }}">
     <title>Results</title>
   </head>
   <body>
     <h1>Results</h1>
-    <p>Start Date: {{ start_date }}</p>
-    <p>End Date: {{ end_date }}</p>
-    <p>Player Name: {{ player_name }}</p>
-    <table>
-      <thead>
+    {% if results %}
+      <table>
         <tr>
-          <th>Date</th>
-          <th>GEXP</th>
+          <th id="date-header">Date</th>
+          <th id="amount-header">Amount</th>
+          <th>Rank</th>
         </tr>
-      </thead>
-      <tbody>
-        {% for result in results %}
-        <tr>
-          <td>{{ result[0] }}</td>
-          <td>{{ result[1] }}</td>
-        </tr>
+        {% for row in results %}
+          <tr>
+            <td>{{ row[1] }}</td>
+            <td>{{ row[3]|intcomma }}</td>
+            <td>
+              {% if row[4] == "Guild Master" %}
+                <span class="guild-master">{{ row[4] }}</span>
+              {% elif row[4] == "Guild Staff" %}
+                <span class="guild-staff">{{ row[4] }}</span>
+              {% elif row[4] == "Member" %}
+                <span class="rank-member">{{ row[4] }}</span>
+              {% elif row[4] == "Celestial" %}
+                <span class="rank-celestial">{{ row[4] }}</span>
+              {% elif row[4] == "Legend" %}
+                <span class="rank-legend">{{ row[4] }}</span>
+              {% elif row[4] == "Champion" %}
+                <span class="rank-champion">{{ row[4] }}</span>
+              {% else %}
+                {{ row[4] }}
+              {% endif %}
+            </td>
+          </tr>
         {% endfor %}
-      </tbody>
-    </table>
+      </table>
+    {% else %}
+      <p>No results found.</p>
+    {% endif %}
   </body>
 </html>
