@@ -68,4 +68,20 @@ span.rank-legend {
   color: #4a1272;
 }
 
+.sort-button {
+  background-color: #2ecc71;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  margin-right: 10px;
+  font-family: 'MinecraftRegular', sans-serif;
+}
 
+.sort-button:hover {
+  background-color: #27ae60;
+}
+
+.sort-button.active {
+  background-color: #27ae60;
+}
