@@ -1,10 +1,15 @@
 import sqlite3
+
+import humanize as humanize
 import requests
 
 from flask import Flask, render_template, request
 
 
 app = Flask(__name__)
+
+# Register the intcomma filter
+app.jinja_env.filters['intcomma'] = humanize.intcomma
 
 
 def connect_db():
@@ -22,19 +27,24 @@ def get_uuid_from_entry(entry):
     return uuid
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        player_name = request.form['player_name']
-        start_date = request.form['start_date']
-        end_date = request.form['end_date']
-        conn = connect_db()
-        c = conn.cursor()
-        query = f"SELECT * FROM expHistory WHERE player_name='{player_name}'"
-        c.execute(query)
-        results = c.fetchall()
-        return render_template('results.html', results=results)
     return render_template('index.html')
+
+
+@app.route('/query_database', methods=['POST'])
+def query_database():
+    start_date = request.form['start_date']
+    end_date = request.form['end_date']
+    player_name = get_uuid_from_entry(request.form['player_name'])
+    conn = connect_db()
+    c = conn.cursor()
+    c.execute("SELECT * FROM expHistory WHERE date BETWEEN ? AND ? AND uuid = ? ORDER BY date ASC",
+              (start_date, end_date, player_name))
+    results = c.fetchall()
+    conn.close()
+    data = {"playername": player_name}
+    return render_template('results.html', results=results, data=data)
 
 
 if __name__ == "__main__":
