@@ -1,0 +1,71 @@
+@font-face {
+    font-family: 'MinecraftRegular';
+    src: url("../fonts/MinecraftRegular-Bmg3.otf");
+}
+
+body {
+  background-color: #34495e;
+  font-family: Arial, sans-serif;
+  color: #ffffff;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 50px;
+  border: 1px solid white;
+}
+
+th {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-size: 120%;
+}
+
+td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid white;
+  border-bottom: 1px dotted lightgray;
+  font-family: 'MinecraftRegular', sans-serif;
+  font-size: 90%;
+}
+
+th {
+  background-color: #2ecc71;
+  color: #fff;
+  font-family: 'MinecraftRegular', sans-serif;
+}
+
+span.guild-master {
+  color: #ff8317;
+}
+
+span.guild-staff {
+  color: #ff00d7;
+}
+
+span.rank-champion {
+  color: #d0c11f;
+}
+
+span.rank-member {
+  color: #00AA00;
+}
+
+span.rank-celestial {
+  color: #2aaabd;
+}
+
+span.rank-legend {
+  color: #4a1272;
+}
+
+
