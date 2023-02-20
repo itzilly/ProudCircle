@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
     <title>GEXP Graph</title>
   </head>
   <body>
     <div class="container">
       <h1>GEXP Graph</h1>
 
-      <script type="text/javascript" src="{{ url_for('static', filename='form.js') }}"></script>
-      <form>
+      <script type="text/javascript" src="{{ url_for('static', filename='scripts/index_form.js') }}"></script>
+      <form action="{{ url_for('query_database') }}" method="post">
 
         <label for="start_date">Start Date:</label>
         <input type="date" id="start_date" name="start_date" required onchange="checkDate()">
