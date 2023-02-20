@@ -1,5 +1,4 @@
 const table = document.querySelector('table');
-const headerCells = table.querySelectorAll('th');
 const rows = Array.from(table.querySelectorAll('tr')).slice(1);
 
 function sortTable(columnIndex, ascending) {
@@ -28,18 +27,18 @@ function sortTable(columnIndex, ascending) {
   rows.forEach(row => tbody.appendChild(row));
 }
 
-headerCells.forEach((header, index) => {
-  header.addEventListener('click', () => {
-    // Determine sort order based on current header class
-    const sortOrder = header.classList.contains('ascending') ? 'descending' : 'ascending';
-    const ascending = sortOrder === 'ascending';
+document.getElementById('sort-date-asc').addEventListener('click', () => {
+  sortTable(0, true);
+});
 
-    // Remove existing sort classes from header cells
-    headerCells.forEach(header => header.classList.remove('ascending', 'descending'));
+document.getElementById('sort-date-desc').addEventListener('click', () => {
+  sortTable(0, false);
+});
 
-    // Add new sort class to the clicked header cell
-    header.classList.add(sortOrder);
+document.getElementById('sort-amount-asc').addEventListener('click', () => {
+  sortTable(1, true);
+});
 
-    sortTable(index, ascending);
-  });
+document.getElementById('sort-amount-desc').addEventListener('click', () => {
+  sortTable(1, false);
 });
