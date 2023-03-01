@@ -1,91 +1,68 @@
-/* navbar styles */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 20px;
-  background-color: rgba(52, 73, 94, 0.8);
-  transition: background-color 0.5s ease-in-out;
-  z-index: 1000;
-}
+  * {
+    margin:auto;
+  }
+  body {
+    background-color: rgb(46, 46, 94);
+  }
+  
+  .nav-flex-box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    position: sticky;
+    text-align: center;
+    font-family: Helvetica, sans-serif;
+  }
+  .nav-flex-box > a {
+    margin:2%;
+    text-align: center;
+  }
+  
+  #guild-name {
+    float: left;
+    margin-right:auto;
+  }
 
-.navbar img {
-  height: 50px;
-  cursor: pointer;
-  transition: transform 0.3s ease-in-out;
-}
 
-.navbar img:hover {
-  transform: scale(1.1);
-}
+  .dropdown-menu {
+    position: relative;
+    display: inline-block;
+  }
 
-.navbar ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
+  .nav-flex-box a {
+    text-decoration: none;
+    color:aliceblue;
+  }
 
-.navbar li {
-  margin: 0 10px;
-  position: relative;
-}
+  .dropdown-menu-content {
+    position: absolute;
+    display: none;
+    min-width: 100%;
+    padding: 10px, 15px;
+    z-index: 1;
+    box-shadow: 0px, 5px, 10px, 0px, rgba(0,0,0,.3); 
+    overflow: auto;
+    background-color: rgb(82, 82, 167);
+  }
+  
+  .dropdown-menu:hover .dropdown-menu-content {
+    display: block;
+  }
 
-.navbar a {
-  color: #fff;
-  text-decoration: none;
-  transition: color 0.3s ease-in-out;
-}
-
-.navbar a:hover {
-  color: #2ecc71;
-}
-
-.navbar ul ul {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: rgba(52, 73, 94, 0.8);
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity 0.5s ease-in-out;
-  z-index: 1000;
-}
-
-.navbar ul ul ul {
-  top: 0;
-  left: 100%;
-}
-
-.navbar ul li:hover > ul {
-  visibility: visible;
-  opacity: 1;
-}
-
-.navbar ul ul li {
-  width: 200px;
-  border-bottom: 1px solid #2ecc71;
-}
-
-.navbar ul ul li:last-child {
-  border-bottom: none;
-}
-
-.navbar ul ul a {
-  padding: 10px 20px;
-  font-size: 16px;
-  display: block;
-  transition: color 0.3s ease-in-out;
-}
-
-.navbar ul ul a:hover {
-  color: #2ecc71;
-}
-
-.navbar ul ul ul {
-  margin-left: 200px;
-  top: 0;
-}
+  .dropdown-menu-content:hover a:hover {
+    background-color: blue;
+  }
+  
+  .nav-has-scrolled {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    position: sticky;
+    text-align: center;
+    font-family: Helvetica, sans-serif;
+    background-color:black;
+  }
