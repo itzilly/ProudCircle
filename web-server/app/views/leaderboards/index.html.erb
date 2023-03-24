@@ -1,0 +1,28 @@
+<%= stylesheet_link_tag 'leaderboard' %>
+
+<h1>Showing you the <%= @leaderboard_type %> leaderboard</h1>
+
+<% unless @start_date.nil? %>
+  <h3>Start Date: <%=  @start_date  %></h3>
+<%  end %>
+
+<% unless @end_date.nil? %>
+  <h3>End Date: <%=  @end_date  %></h3>
+<%  end %>
+
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Score</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @leaderboard_data.each do |leaderboard_item| %>
+    <tr>
+      <td><%= leaderboard_item[0] %></td>
+      <td><%= leaderboard_item[1] %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
