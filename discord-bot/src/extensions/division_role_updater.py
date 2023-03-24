@@ -36,10 +36,11 @@ class DivisionRoleUpdater(commands.Cog):
 
 		self.members_updated = 0
 		self.errors = 0
-		self.has_run = False
+		self.has_run = True
 		self.is_running = False
 
 		self.cosmetic_role_id = 1055844799015563274
+		self.update_divisions_task.start()
 
 	def get_member_xp(self, member):
 		cmd = "SELECT uuid, amount FROM expHistory ORDER BY date DESC"
