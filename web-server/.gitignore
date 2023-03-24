@@ -5,3 +5,20 @@ identifier.sqlite
 /env
 
 *.pyc
+
+# Ignore master key for decrypting credentials and more.
+/config/database.yml
+/config/secrets.yml
+/config/master.key
+
+# Ignore the default SQLite database.
+/db/*.sqlite3
+/db/*.sqlite3-journal
+/db/*.sqlite3-shm
+/db/*.sqlite3-wal
+
+# Ignore all logfiles and tempfiles.
+/log/*
+!/log/.keep
+/tmp
+.DS_Store
