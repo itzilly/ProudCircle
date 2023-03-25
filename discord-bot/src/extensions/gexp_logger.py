@@ -217,6 +217,7 @@ class GexpLogger(commands.Cog):
 			return True
 		return False
 
+
 async def setup(bot: commands.Bot):
 	logging.debug("Adding cog: GexpLogger")
 	await bot.add_cog(GexpLogger(bot))
