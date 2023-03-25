@@ -4,7 +4,7 @@ import logging
 import sqlite3
 import datetime
 
-DATA_FOLDER_PATH = "data"
+DATA_FOLDER_PATH = "../data"
 LOGS_FOLDER_PATH = os.path.join(DATA_FOLDER_PATH, "logs")
 DATABASE_PATH = os.path.join(DATA_FOLDER_PATH, "proudcircle.db")
 XP_DIVISION_DATA_PATH = os.path.join(DATA_FOLDER_PATH, "xp_divisions.json")
