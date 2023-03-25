@@ -3,10 +3,10 @@ import logging
 import requests
 import datetime
 
-from util import local, mcign, embed_lib
 from util.mcign import MCIGN
 from discord import app_commands
 from discord.ext import commands
+from util import local, mcign, embed_lib
 
 
 how_to_link = discord.Embed(colour=discord.Colour(0xfa1195))

@@ -1,6 +1,5 @@
-import datetime
-
 import discord
+import datetime
 
 
 class ApiErrorEmbed(discord.Embed):

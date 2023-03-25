@@ -1,10 +1,9 @@
 import discord
 import logging
 
-from util import local, embed_lib
+from util import local
 from discord import app_commands
 from discord.ext import commands
-
 from util.command_helper import ensure_bot_permissions
 
 
@@ -27,8 +26,6 @@ class ClearCacheCommand(commands.Cog):
 			description="Cleared uuidCache"
 		)
 		await interaction.response.send_message(embed=completed_embed)
-
-
 
 
 async def setup(bot: commands.Bot):

@@ -2,7 +2,6 @@ import logging
 import util.local as fs
 
 from util.embed_lib import *
-from util.mcign import MCIGN
 
 
 async def ensure_bot_permissions(interaction: discord.Interaction, send_deny_response=False):
@@ -28,12 +27,3 @@ async def ensure_bot_permissions(interaction: discord.Interaction, send_deny_res
 	if send_deny_response and not has_permission:
 		await interaction.response.send_message(embed=InsufficientPermissionsEmbed())
 	return has_permission
-
-
-# def define_player_from_interaction(interaction: discord.Interaction):
-# 	player = fs.LOCAL_DATA.uuid_cache.get_player(interaction.user.id)
-# 	if player is None:
-# 		timestamp = datetime.datetime.now().timestamp()
-# 		player = MCIGN(player_id)
-# 		self.local_data.uuid_cache.add_player(player.uuid, player.name, timestamp)
-# 	return player

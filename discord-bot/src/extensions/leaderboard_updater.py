@@ -2,19 +2,16 @@ import json
 import time
 import asyncio
 import logging
-
 import aiohttp
 import discord
 import datetime
+import util.mcign
 
 from discord import app_commands
-from discord.ext import tasks, commands
-
-import util.mcign
 from util import local, embed_lib
-from util.command_helper import ensure_bot_permissions
-
+from discord.ext import tasks, commands
 from util.local import XP_DIVISION_DATA_PATH
+from util.command_helper import ensure_bot_permissions
 
 
 class LeaderboardUpdater(commands.Cog):

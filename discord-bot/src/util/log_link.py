@@ -1,7 +1,6 @@
 import json
-import logging
-
 import discord
+import logging
 import requests
 
 bot = None

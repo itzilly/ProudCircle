@@ -1,6 +1,6 @@
 import logging
-from datetime import datetime
 
+from datetime import datetime
 from util.local import LOCAL_DATA, UuidCache
 
 

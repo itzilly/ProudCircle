@@ -1,17 +1,13 @@
 import json
-import time
-import uuid
-
 import aiohttp
 import discord
 import logging
+import util.local
 
 from datetime import datetime
 from discord import app_commands
+from util import local, embed_lib
 from discord.ext import commands, tasks
-
-import util.local
-from util import local, embed_lib, log_link
 from util.local import XP_DIVISION_DATA_PATH
 
 
@@ -42,9 +38,6 @@ class DivisionRoleUpdater(commands.Cog):
 		self.cosmetic_role_id = 1055844799015563274
 		self.update_divisions_task.start()
 
-	def get_member_xp(self, member):
-		cmd = "SELECT uuid, amount FROM expHistory ORDER BY date DESC"
-
 	async def strip_member_of_divisions(self, member):
 		uuid = member[0]
 		discord_link = self.local_data.discord_link.get_link(uuid)
@@ -58,7 +51,7 @@ class DivisionRoleUpdater(commands.Cog):
 			for member_role in discord_member.roles:
 				if member_role.id == role_id:
 					logging.debug(f"Removing {member_role.name} from {discord_link.discord_username}")
-					# await discord_member.remove_roles([discord.Object(role_id)])
+				# await discord_member.remove_roles([discord.Object(role_id)])
 
 		logging.debug(f"Removing cosmetic role from {discord_link.discord_username}")
 		await discord_member.remove_roles([discord.Object(self.cosmetic_role_id)])
@@ -74,7 +67,8 @@ class DivisionRoleUpdater(commands.Cog):
 			return
 		discord_member = self.bot.get_guild(self.server_id).get_member(discord_link.discord_id)
 		if discord_member is None:
-			logging.error(f"Discord member ({discord_link.discord_id}) not found, please view latest log file for more details")
+			logging.error(
+				f"Discord member ({discord_link.discord_id}) not found, please view latest log file for more details")
 			logging.debug(f"link.row_id : {discord_link.row_id}")
 			logging.debug(f"link.uuid : {discord_link.uuid}")
 			logging.debug(f"link.discord_id : {discord_link.discord_id}")
@@ -153,7 +147,7 @@ class DivisionRoleUpdater(commands.Cog):
 		if not is_bot_admin:
 			await interaction.response.send_message(embed=embed_lib.InsufficientPermissionsEmbed())
 			return
-		
+
 		await interaction.response.defer()
 		await self.run()
 
@@ -173,27 +167,6 @@ class DivisionRoleUpdater(commands.Cog):
 			self.has_run = True
 			logging.debug("DivisionRoleUpdater: Skipping first run")
 			return
-
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-		print()
-
 		await self.run()
 
 		finished_embed = discord.Embed(
@@ -210,7 +183,6 @@ class DivisionRoleUpdater(commands.Cog):
 	@update_divisions_task.before_loop
 	async def before_update_divisions_task(self):
 		await self.bot.wait_until_ready()
-
 
 	# Permissions Check
 	def check_permission(self, user: discord.Interaction.user):
