@@ -7,6 +7,7 @@ import datetime
 DATA_FOLDER_PATH = "../../data"
 LOGS_FOLDER_PATH = os.path.join(DATA_FOLDER_PATH, "logs")
 IMAGES_FOLDER_PATH = os.path.join(DATA_FOLDER_PATH, "images")
+FONTS_FOLDER_PATH = os.path.join(DATA_FOLDER_PATH, "fonts")
 DATABASE_PATH = os.path.join(DATA_FOLDER_PATH, "proudcircle.db")
 XP_DIVISION_DATA_PATH = os.path.join(DATA_FOLDER_PATH, "xp_divisions.json")
 LOCAL_DATA = None

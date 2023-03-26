@@ -14,14 +14,14 @@ class DrakeMeme(commands.Cog):
 		super().__init__(*args, **kwargs)
 		self.bot = bot
 		self.template_url = os.path.join(util.local.IMAGES_FOLDER_PATH, 'drake_template.png')
-		logging.debug(f"Found path of images: {self.template_url}")
+		self.font_path = os.path.join(util.local.FONTS_FOLDER_PATH, 'arial.ttf')
 
 	@app_commands.command(name="drake", description="Make drake meme")
 	@app_commands.describe(lesser="Text that goes on top")
 	@app_commands.describe(lesser="Text that goes on bottom")
 	async def drake_meme_command(self, interaction: discord.Interaction, lesser: str, greater: str):
 		template = Image.open(self.template_url)
-		font = ImageFont.truetype("arial.ttf", 28)
+		font = ImageFont.truetype(self.font_path, 28)
 
 		text_image = Image.new('RGBA', (template.width, template.height), (0, 0, 0, 0))
 
