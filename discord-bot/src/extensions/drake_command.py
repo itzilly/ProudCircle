@@ -44,7 +44,7 @@ class DrakeMeme(commands.Cog):
 		template.paste(text_image, (0, 0), text_image)
 
 		# Save the generated meme image
-		meme_file_path = "./data/images/tmp/meme.png"
+		meme_file_path = os.path.join(util.local.IMAGES_FOLDER_PATH, "tmp/meme.png")
 		template.save(meme_file_path, format='PNG')
 
 		# Send the meme image as a message in the Discord channel
