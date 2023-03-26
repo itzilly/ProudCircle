@@ -13,7 +13,7 @@ class DrakeMeme(commands.Cog):
 	def __init__(self, bot: commands.Bot, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 		self.bot = bot
-		self.template_url = os.path.join(util.local.IMAGES_FOLDER_PATH, '/drake_template.png')
+		self.template_url = os.path.join(util.local.IMAGES_FOLDER_PATH, 'drake_template.png')
 		logging.debug(f"Found path of images: {self.template_url}")
 
 	@app_commands.command(name="drake", description="Make drake meme")
