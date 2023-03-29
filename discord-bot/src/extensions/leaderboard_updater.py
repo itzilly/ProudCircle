@@ -5,6 +5,9 @@ import logging
 import aiohttp
 import discord
 import datetime
+
+import requests
+
 import util.mcign
 
 from discord import app_commands
@@ -474,16 +477,25 @@ class LeaderboardUpdater(commands.Cog):
 		await interaction.followup.send(embed=finished_embed)
 
 	async def construct_leaderboard(self, leaderboard_embed: discord.Embed, sql_command: str) -> discord.Embed:
-		# TODO: Only add players if they are currently in the guild
-
 		cursor = self.local.cursor
 		query = cursor.execute(sql_command)
 		results = query.fetchall()
+
+		key = self.config.get_setting("api_key")
+		guild_id = self.config.get_setting("guild_id")
+		guild_url = f"https://api.hypixel.net/guild?key={key}&id={guild_id}"
+		data = requests.get(guild_url)
+		json_data = data.json()
+		guild_members = json_data["guild"]["members"]
+		members_list = [member["uuid"] for member in guild_members]
 
 		leaderboard_data = []
 		position = 1
 		for line in results:
 			uuid, amount = line[0], line[1]
+			if uuid not in members_list:
+				continue
+
 			player_name = await self.resolve_player_title(uuid)
 
 			if position == 1:
