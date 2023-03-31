@@ -1,0 +1,52 @@
+.news-entry {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.news-title {
+    text-align: center;
+}
+
+.news-author {
+    text-align: center;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.news-date:hover .calendar {
+    display: block;
+}
+
+.news-content {
+    text-align: left;
+}
+
+.news-date {
+    color: #999;
+    font-size: 0.8em;
+    text-align: right;
+    margin-top: 10px;
+    cursor: help;
+    position: relative;
+}
+
+.calendar {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 0.8em;
+    color: #333;
+    z-index: 9999;
+}
+
+.indented {
+    text-indent: 25px;
+}
