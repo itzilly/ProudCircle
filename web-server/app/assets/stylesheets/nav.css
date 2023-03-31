@@ -1,0 +1,104 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 140px;
+    background-color: #333;
+    color: #fff;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-left img {
+    height: 140px;
+    width: 154px;
+    margin-right: 10px;
+}
+
+.navbar-brand-container {
+    display: flex;
+    flex-direction: column;
+    position: relative; /* add a position property */
+}
+
+.navbar-brand {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-right: 10px;
+    position: relative; /* add a position property */
+    z-index: 1; /* add a z-index property */
+    transition: transform 0.5s ease-in-out; /* add a transition property */
+}
+
+.navbar-brand:hover {
+    transform: translateY(-10px); /* adjust the translateY value to match your preference */
+}
+
+.navbar-home {
+    display: none;
+    font-size: 0.8em;
+    position: absolute; /* add a position property */
+    top: 100%; /* add a top property */
+    left: 0; /* add a left property */
+    opacity: 0; /* add an opacity property */
+    z-index: 0; /* add a z-index property */
+    background-color: rgba(0, 0, 0, 0.5); /* add a background-color property */
+    width: 100%; /* add a width property */
+    text-align: center; /* add a text-align property */
+    padding: 10px 0; /* add a padding property */
+    transition: opacity 0.5s ease-in-out; /* add a transition property */
+}
+
+.navbar-brand-container:hover .navbar-home {
+    color: white;
+    text-decoration: none;
+    opacity: 1; /* adjust the opacity value */
+    z-index: 1; /* add a z-index property */
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-online {
+    font-size: 0.8em;
+    margin-right: 10px;
+}
+
+#players-online {
+    font-weight: bold;
+}
+
+.navbar-links {
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+}
+
+.navbar-links a {
+    font-size: 1.1em;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    margin: 0 20px;
+}
+
+.navbar-links a:hover {
+    border-bottom: 2px solid #fff;
+}

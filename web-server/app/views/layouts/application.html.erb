@@ -1,16 +1,39 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>WebServer</title>
+    <title>Proud Circle</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "nav", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
+    <nav class="navbar">
+      <div class="navbar-left">
+        <%= image_tag("navbar_icon.png", alt: "Icon") %>
+        <div class="navbar-brand-container">
+          <!--      <span class="navbar-brand">Proud Circle</span>-->
+          <!--      <span class="navbar-home">Return Home</span>-->
+          <a href="/" class="navbar-brand">Proud Circle</a>
+          <a href="/" class="navbar-home">Return Home</a>
+        </div>
+      </div>
+      <div class="navbar-right">
+        <span class="navbar-online">Online: <span id="players-online">0</span></span>
+      </div>
+    </nav>
+
+    <div class="navbar-links">
+      <a href="/news">News</a>
+      <a href="#">Support</a>
+      <a href="#">Apply</a>
+      <a href="#">Leaderboards</a>
+    </div>
     <%= yield %>
   </body>
 </html>
+
